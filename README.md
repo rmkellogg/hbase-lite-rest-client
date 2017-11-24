@@ -7,6 +7,15 @@ External Dependencies: Apache Commons Logging, Apache Commons Lang3, Apache Comm
 
 By comparison the HBase REST Client included with HBase 2.x even after careful exclusions has 21 dependencies.
  
+Care has been taken to allow for use against existing clients of the RemoteHTable interface by replacement of the package name alone.  
+
+Improvments:
+
+   * Fluent API for construction of RemoteHTable and RemoteAdmin.
+   * Access to underlying Apache HttpClient for unique client needs
+   * Reduced footprint by stripping away rarely used or methods not supported by the HBase REST Server.
+   * RemoteHTable and RemoteAdmin are now interfaces.
+
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
   
 RemoteHTable Example:
