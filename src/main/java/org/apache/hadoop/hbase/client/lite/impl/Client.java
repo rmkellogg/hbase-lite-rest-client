@@ -47,7 +47,6 @@ import org.apache.http.util.EntityUtils;
 * A wrapper around HttpClient which provides some useful function and
 * semantics for interacting with the REST gateway.
 */
-//@InterfaceAudience.Public
 public class Client {
  public static final Header[] EMPTY_HEADER_ARRAY = new Header[0];
 
@@ -55,47 +54,12 @@ public class Client {
  
  private HttpClient httpClient;
  private Cluster cluster;
-// private boolean sslEnabled;
  private HttpResponse resp;
  private HttpGet httpGet = null;
  private String protocol;
  
-// private Map<String, String> extraHeaders;
  private Map<String, String> extraHeaders = new ConcurrentHashMap<>();
 
-// /**
-//  * Default Constructor
-//  */
-// public Client() {
-//   this(null);
-// }
-//
-// private void initialize(Cluster cluster, boolean sslEnabled) {
-//   this.cluster = cluster;
-//   this.sslEnabled = sslEnabled;
-//   extraHeaders = new ConcurrentHashMap<>();
-//   String clspath = System.getProperty("java.class.path");
-//   LOG.debug("classpath " + clspath);
-//   this.httpClient = new DefaultHttpClient();
-//   this.httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 2000);
-// }
-//
-// /**
-//  * Constructor
-//  * @param cluster the cluster definition
-//  */
-// public Client(Cluster cluster) {
-//   initialize(cluster, false);
-// }
-//
-// /**
-//  * Constructor
-//  * @param cluster the cluster definition
-//  * @param sslEnabled enable SSL or not
-//  */
-// public Client(Cluster cluster, boolean sslEnabled) {
-//   initialize(cluster, sslEnabled);
-// }
  public Client(Cluster cluster, String protocol, HttpClient httpClient) {
 	 this.cluster = cluster;
 	 this.protocol = protocol;
@@ -124,27 +88,6 @@ public class Client {
    extraHeaders.put(name, value);
  }
 
-// /**
-//  * Get an extra header value.
-//  */
-// public String getExtraHeader(final String name) {
-//   return extraHeaders.get(name);
-// }
-//
-// /**
-//  * Get all extra headers (read-only).
-//  */
-// public Map<String, String> getExtraHeaders() {
-//   return Collections.unmodifiableMap(extraHeaders);
-// }
-//
-// /**
-//  * Remove an extra header.
-//  */
-// public void removeExtraHeader(final String name) {
-//   extraHeaders.remove(name);
-// }
-
  /**
   * Execute a transaction method given only the path. Will select at random
   * one of the members of the supplied cluster definition and iterate through
@@ -170,11 +113,6 @@ public class Client {
      cluster.lastHost = cluster.nodes.get(i);
      try {
        StringBuilder sb = new StringBuilder();
-//       if (sslEnabled) {
-//         sb.append("https://");
-//       } else {
-//         sb.append("http://");
-//       }
        sb.append(protocol);
        sb.append("://");
        sb.append(cluster.lastHost);
@@ -256,20 +194,6 @@ public class Client {
    }
    return executeURI(method, headers, path);
  }
-
-// /**
-//  * @return the cluster definition
-//  */
-// public Cluster getCluster() {
-//   return cluster;
-// }
-//
-// /**
-//  * @param cluster the cluster definition
-//  */
-// public void setCluster(Cluster cluster) {
-//   this.cluster = cluster;
-// }
 
  /**
   * Send a HEAD request
@@ -373,8 +297,6 @@ public class Client {
   * @throws IOException If an I/O (transport) problem occurs while obtaining the
   * response body.
   */
-// @edu.umd.cs.findbugs.annotations.SuppressWarnings(value =
-//     "NP_LOAD_OF_KNOWN_NULL_VALUE", justification = "null is possible return value")
  public static byte[] getResponseBody(HttpResponse resp) throws IOException {
    if (resp.getEntity() == null) return null;
    try (InputStream instream = resp.getEntity().getContent()) {

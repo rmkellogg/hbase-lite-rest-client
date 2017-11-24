@@ -35,15 +35,7 @@ import org.apache.hadoop.hbase.rest.protobuf.generated.CellSetMessage.CellSet;
 * Representation of a grouping of cells. May contain cells from more than
 * one row. Encapsulates RowModel and CellModel models.
 */
-//@XmlRootElement(name="CellSet")
-//@XmlAccessorType(XmlAccessType.FIELD)
-//@InterfaceAudience.Private
-//public class CellSetModel implements Serializable, ProtobufMessageHandler {
 public class CellSetModel implements ProtobufMessageHandler {
-
-// private static final long serialVersionUID = 1L;
-
-// @XmlElement(name="Row")
  private List<RowModel> rows;
 
  /**

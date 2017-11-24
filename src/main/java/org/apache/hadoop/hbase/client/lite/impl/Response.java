@@ -27,10 +27,7 @@ import org.apache.http.HttpResponse;
 /**
 * The HTTP result code, response headers, and body of a HTTP response.
 */
-//@InterfaceAudience.Public
 public class Response {
-// private static final Log LOG = LogFactory.getLog(Response.class);
-
  private int code;
  private Header[] headers;
  private byte[] body;

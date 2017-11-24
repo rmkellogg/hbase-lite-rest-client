@@ -56,21 +56,10 @@ import org.apache.hadoop.hbase.client.lite.impl.HConstants;
 * <p>
 * To add a filter, call {@link #setFilter(Filter) setFilter}.
 */
-//@InterfaceAudience.Public
-//public class Get extends Query {
 public class Get {
-//public class Get extends Query
-// implements Row, Comparable<Row> {
-// private static final Log LOG = LogFactory.getLog(Get.class);
-
  private byte [] row = null;
  private int maxVersions = 1;
-// private boolean cacheBlocks = true;
-// private int storeLimit = -1;
-// private int storeOffset = 0;
  private TimeRange tr = new TimeRange();
-// private boolean checkExistenceOnly = false;
-// private boolean closestRowBefore = false;
  private Map<byte [], NavigableSet<byte []>> familyMap = new TreeMap<>(Bytes.BYTES_COMPARATOR);
 
  /**
@@ -84,97 +73,6 @@ public class Get {
    Mutation.checkRow(row);
    this.row = row;
  }
-
-// /**
-//  * Copy-constructor
-//  *
-//  * @param get
-//  */
-// public Get(Get get) {
-//   this(get.getRow());
-//   // from Query
-//   this.setFilter(get.getFilter());
-//   this.setReplicaId(get.getReplicaId());
-//   this.setConsistency(get.getConsistency());
-//   // from Get
-//   this.cacheBlocks = get.getCacheBlocks();
-//   this.maxVersions = get.getMaxVersions();
-//   this.storeLimit = get.getMaxResultsPerColumnFamily();
-//   this.storeOffset = get.getRowOffsetPerColumnFamily();
-//   this.tr = get.getTimeRange();
-//   this.checkExistenceOnly = get.isCheckExistenceOnly();
-//   this.loadColumnFamiliesOnDemand = get.getLoadColumnFamiliesOnDemandValue();
-//   Map<byte[], NavigableSet<byte[]>> fams = get.getFamilyMap();
-//   for (Map.Entry<byte[],NavigableSet<byte[]>> entry : fams.entrySet()) {
-//     byte [] fam = entry.getKey();
-//     NavigableSet<byte[]> cols = entry.getValue();
-//     if (cols != null && cols.size() > 0) {
-//       for (byte[] col : cols) {
-//         addColumn(fam, col);
-//       }
-//     } else {
-//       addFamily(fam);
-//     }
-//   }
-//   for (Map.Entry<String, byte[]> attr : get.getAttributesMap().entrySet()) {
-//     setAttribute(attr.getKey(), attr.getValue());
-//   }
-//   for (Map.Entry<byte[], TimeRange> entry : get.getColumnFamilyTimeRange().entrySet()) {
-//     TimeRange tr = entry.getValue();
-//     setColumnFamilyTimeRange(entry.getKey(), tr.getMin(), tr.getMax());
-//   }
-//   super.setPriority(get.getPriority());
-// }
-//
-// /**
-//  * Create a Get operation for the specified row.
-//  * @param row
-//  * @param rowOffset
-//  * @param rowLength
-//  */
-// public Get(byte[] row, int rowOffset, int rowLength) {
-//   Mutation.checkRow(row, rowOffset, rowLength);
-//   this.row = Bytes.copy(row, rowOffset, rowLength);
-// }
-//
-// /**
-//  * Create a Get operation for the specified row.
-//  * @param row
-//  */
-// public Get(ByteBuffer row) {
-//   Mutation.checkRow(row);
-//   this.row = new byte[row.remaining()];
-//   row.get(this.row);
-// }
-//
-// public boolean isCheckExistenceOnly() {
-//   return checkExistenceOnly;
-// }
-//
-// public Get setCheckExistenceOnly(boolean checkExistenceOnly) {
-//   this.checkExistenceOnly = checkExistenceOnly;
-//   return this;
-// }
-//
-// /**
-//  * This will always return the default value which is false as client cannot set the value to this
-//  * property any more.
-//  * @deprecated since 2.0.0 and will be removed in 3.0.0
-//  */
-// @Deprecated
-// public boolean isClosestRowBefore() {
-//   return closestRowBefore;
-// }
-//
-// /**
-//  * This is not used any more and does nothing. Use reverse scan instead.
-//  * @deprecated since 2.0.0 and will be removed in 3.0.0
-//  */
-// @Deprecated
-// public Get setClosestRowBefore(boolean closestRowBefore) {
-//   // do Nothing
-//   return this;
-// }
 
  /**
   * Get all columns from the specified family.
@@ -223,51 +121,6 @@ public class Get {
    return this;
  }
 
-// /**
-//  * Get versions of columns with the specified timestamp.
-//  * @param timestamp version timestamp
-//  * @return this for invocation chaining
-//  */
-// public Get setTimeStamp(long timestamp)
-// throws IOException {
-//   try {
-//     tr = new TimeRange(timestamp, timestamp+1);
-//   } catch(Exception e) {
-//     // This should never happen, unless integer overflow or something extremely wrong...
-////     LOG.error("TimeRange failed, likely caused by integer overflow. ", e);
-//     throw e;
-//   }
-//   return this;
-// }
-//
-// @Override public Get setColumnFamilyTimeRange(byte[] cf, long minStamp, long maxStamp) {
-//   return (Get) super.setColumnFamilyTimeRange(cf, minStamp, maxStamp);
-// }
-//
-// /**
-//  * Get all available versions.
-//  * @return this for invocation chaining
-//  * @deprecated It is easy to misunderstand with column family's max versions, so use
-//  *             {@link #readAllVersions()} instead.
-//  */
-// @Deprecated
-// public Get setMaxVersions() {
-//   return readAllVersions();
-// }
-//
-// /**
-//  * Get up to the specified number of versions of each column.
-//  * @param maxVersions maximum versions for each column
-//  * @throws IOException if invalid number of versions
-//  * @return this for invocation chaining
-//  * @deprecated It is easy to misunderstand with column family's max versions, so use
-//  *             {@link #readVersions(int)} instead.
-//  */
-// @Deprecated
-// public Get setMaxVersions(int maxVersions) throws IOException {
-//   return readVersions(maxVersions);
-// }
-
  /**
   * Get all available versions.
   * @return this for invocation chaining
@@ -291,63 +144,6 @@ public class Get {
    return this;
  }
 
-// public Get setLoadColumnFamiliesOnDemand(boolean value) {
-//   return (Get) super.setLoadColumnFamiliesOnDemand(value);
-// }
-//
-// /**
-//  * Set the maximum number of values to return per row per Column Family
-//  * @param limit the maximum number of values returned / row / CF
-//  * @return this for invocation chaining
-//  */
-// public Get setMaxResultsPerColumnFamily(int limit) {
-//   this.storeLimit = limit;
-//   return this;
-// }
-//
-// /**
-//  * Set offset for the row per Column Family. This offset is only within a particular row/CF
-//  * combination. It gets reset back to zero when we move to the next row or CF.
-//  * @param offset is the number of kvs that will be skipped.
-//  * @return this for invocation chaining
-//  */
-// public Get setRowOffsetPerColumnFamily(int offset) {
-//   this.storeOffset = offset;
-//   return this;
-// }
-//
-// @Override
-// public Get setFilter(Filter filter) {
-//   super.setFilter(filter);
-//   return this;
-// }
-//
-// /* Accessors */
-//
-// /**
-//  * Set whether blocks should be cached for this Get.
-//  * <p>
-//  * This is true by default.  When true, default settings of the table and
-//  * family are used (this will never override caching blocks if the block
-//  * cache is disabled for that family or entirely).
-//  *
-//  * @param cacheBlocks if false, default settings are overridden and blocks
-//  * will not be cached
-//  */
-// public Get setCacheBlocks(boolean cacheBlocks) {
-//   this.cacheBlocks = cacheBlocks;
-//   return this;
-// }
-//
-// /**
-//  * Get whether blocks should be cached for this Get.
-//  * @return true if default caching should be used, false if blocks should not
-//  * be cached
-//  */
-// public boolean getCacheBlocks() {
-//   return cacheBlocks;
-// }
-
  /**
   * Method for retrieving the get's row
   * @return row
@@ -364,24 +160,6 @@ public class Get {
  public int getMaxVersions() {
    return this.maxVersions;
  }
-
-// /**
-//  * Method for retrieving the get's maximum number of values
-//  * to return per Column Family
-//  * @return the maximum number of values to fetch per CF
-//  */
-// public int getMaxResultsPerColumnFamily() {
-//   return this.storeLimit;
-// }
-//
-// /**
-//  * Method for retrieving the get's offset per row per column
-//  * family (#kvs to be skipped)
-//  * @return the row offset
-//  */
-// public int getRowOffsetPerColumnFamily() {
-//   return this.storeOffset;
-// }
 
  /**
   * Method for retrieving the get's TimeRange
@@ -459,7 +237,6 @@ public class Get {
    // add scalar information first
    map.put("row", Bytes.toStringBinary(this.row));
    map.put("maxVersions", this.maxVersions);
-//   map.put("cacheBlocks", this.cacheBlocks);
    List<Long> timeRange = new ArrayList<>(2);
    timeRange.add(this.tr.getMin());
    timeRange.add(this.tr.getMax());
@@ -488,85 +265,6 @@ public class Get {
      }
    }
    map.put("totalColumns", colCount);
-//   if (this.filter != null) {
-//     map.put("filter", this.filter.toString());
-//   }
-   // add the id if set
-//   if (getId() != null) {
-//     map.put("id", getId());
-//   }
    return map;
  }
-
-// //Row
-// @Override
-// public int compareTo(Row other) {
-//   // TODO: This is wrong.  Can't have two gets the same just because on same row.
-//   return Bytes.compareTo(this.getRow(), other.getRow());
-// }
-//
-// @Override
-// public int hashCode() {
-//   // TODO: This is wrong.  Can't have two gets the same just because on same row.  But it
-//   // matches how equals works currently and gets rid of the findbugs warning.
-//   return Bytes.hashCode(this.getRow());
-// }
-//
-// @Override
-// public boolean equals(Object obj) {
-//   if (this == obj) {
-//     return true;
-//   }
-//   if (obj == null || getClass() != obj.getClass()) {
-//     return false;
-//   }
-//   Row other = (Row) obj;
-//   // TODO: This is wrong.  Can't have two gets the same just because on same row.
-//   return compareTo(other) == 0;
-// }
-//
-// @Override
-// public Get setAttribute(String name, byte[] value) {
-//   return (Get) super.setAttribute(name, value);
-// }
-//
-// @Override
-// public Get setId(String id) {
-//   return (Get) super.setId(id);
-// }
-//
-// @Override
-// public Get setAuthorizations(Authorizations authorizations) {
-//   return (Get) super.setAuthorizations(authorizations);
-// }
-//
-// @Override
-// public Get setACL(Map<String, Permission> perms) {
-//   return (Get) super.setACL(perms);
-// }
-//
-// @Override
-// public Get setACL(String user, Permission perms) {
-//   return (Get) super.setACL(user, perms);
-// }
-//
-// @Override
-// public Get setConsistency(Consistency consistency) {
-//   return (Get) super.setConsistency(consistency);
-// }
-//
-// @Override
-// public Get setReplicaId(int Id) {
-//   return (Get) super.setReplicaId(Id);
-// }
-//
-// @Override
-// public Get setIsolationLevel(IsolationLevel level) {
-//     return (Get) super.setIsolationLevel(level);
-// }
-//
-// @Override
-// public Get setPriority(int priority) {
-//   return (Get) super.setPriority(priority);
-// }
 }

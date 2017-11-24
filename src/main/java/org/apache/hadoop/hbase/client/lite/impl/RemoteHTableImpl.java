@@ -50,15 +50,11 @@ import java.util.TreeMap;
 /**
 * HTable interface to remote tables accessed via REST gateway
 */
-//@InterfaceAudience.Public
-//public class RemoteHTable implements Table {
 public class RemoteHTableImpl implements RemoteHTable {
 
  private static final Log LOG = LogFactory.getLog(RemoteHTable.class);
  
  private final Client client;
-// final Configuration conf;
-// private final byte[] name;
  private final String name;
  private final int maxRetries;
  private final long sleepTime;
@@ -68,7 +64,6 @@ public class RemoteHTableImpl implements RemoteHTable {
      final long startTime, final long endTime, final int maxVersions) {
    StringBuffer sb = new StringBuffer();
    sb.append('/');
-//   sb.append(Bytes.toString(name));
    sb.append(name);
    sb.append('/');
    sb.append(toURLEncodedBytes(row));
@@ -185,33 +180,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    model.addRow(row);
    return model;
  }
-//
-// /**
-//  * Constructor
-//  */
-// public RemoteHTable(Client client, String name) {
-////   this(client, HBaseConfiguration.create(), Bytes.toBytes(name));
-//   this(client, new Properties(), name);
-// }
-//
-// /**
-//  * Constructor
-//  */
-// public RemoteHTable(Client client, Configuration conf, String name) {
-//   this(client, conf, Bytes.toBytes(name));
-// }
-
-// /**
-//  * Constructor
-//  */
-// public RemoteHTable(Client client, Configuration conf, byte[] name) {
-//   this.client = client;
-//   this.conf = conf;
-//   this.name = name;
-//   this.maxRetries = conf.getInt("hbase.rest.client.max.retries", 10);
-//   this.sleepTime = conf.getLong("hbase.rest.client.sleep", 1000);
-// }
-//
  /**
   * Constructor
   */
@@ -222,24 +190,10 @@ public class RemoteHTableImpl implements RemoteHTable {
    this.sleepTime = sleepTime;
  }
 
-// public byte[] getTableName() {
-//   return name.clone();
-// }
- 
  @Override
  public String getName() {
 	   return name;
  }
-
-// @Override
-// public TableName getName() {
-//   return TableName.valueOf(name);
-// }
-//
-// @Override
-// public Configuration getConfiguration() {
-//   return conf;
-// }
 
 // @Override
 // public HTableDescriptor getTableDescriptor() throws IOException {
@@ -308,10 +262,6 @@ public class RemoteHTableImpl implements RemoteHTable {
        LOG.warn("MaxVersions on Gets do not match, using the first in the list ("+maxVersions+")");
      }
 
-//     if (g.getFilter() != null) {
-//       LOG.warn("filters not supported on gets");
-//     }
-
      rows[count] = g.getRow();
      count ++;
    }
@@ -373,7 +323,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    CellSetModel model = buildModelFromPut(put);
    StringBuilder sb = new StringBuilder();
    sb.append('/');
-//   sb.append(Bytes.toString(name));
    sb.append(name);
    sb.append('/');
    sb.append(toURLEncodedBytes(put.getRow()));
@@ -484,16 +433,7 @@ public class RemoteHTableImpl implements RemoteHTable {
      delete(delete);
    }
  }
-//
-// public void flushCommits() throws IOException {
-//   // no-op
-// }
-//
-// @Override
-// public TableDescriptor getDescriptor() throws IOException {
-//   return getTableDescriptor();
-// }
-//
+
  class Scanner implements ResultScanner {
 
    String uri;
@@ -507,7 +447,6 @@ public class RemoteHTableImpl implements RemoteHTable {
      }
      StringBuffer sb = new StringBuffer();
      sb.append('/');
-//     sb.append(Bytes.toString(name));
      sb.append(name);
      sb.append('/');
      sb.append("scanner");
@@ -625,16 +564,6 @@ public class RemoteHTableImpl implements RemoteHTable {
          LOG.warn(e.getMessage(),e);
      }
    }
-
-//   @Override
-//   public boolean renewLease() {
-//     throw new RuntimeException("renewLease() not supported");
-//   }
-//
-//   @Override
-//   public ScanMetrics getScanMetrics() {
-//     throw new RuntimeException("getScanMetrics() not supported");
-//   }
  }
 
 
@@ -657,13 +586,7 @@ public class RemoteHTableImpl implements RemoteHTable {
    scan.addColumn(family, qualifier);
    return new Scanner(scan);
  }
- 
-//
-// public boolean isAutoFlush() {
-//   return true;
-// }
-//
- 
+  
  @Override
  public boolean checkAndPut(byte[] row, byte[] family, byte[] qualifier,
      byte[] value, Put put) throws IOException {
@@ -673,7 +596,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    CellSetModel model = buildModelFromPut(put);
    StringBuilder sb = new StringBuilder();
    sb.append('/');
-//   sb.append(Bytes.toString(name));
    sb.append(name);
    sb.append('/');
    sb.append(toURLEncodedBytes(put.getRow()));
@@ -702,18 +624,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    throw new IOException("checkAndPut request timed out");
  }
 
-// @Override
-// public boolean checkAndPut(byte[] row, byte[] family, byte[] qualifier,
-//     CompareOp compareOp, byte[] value, Put put) throws IOException {
-//   throw new IOException("checkAndPut for non-equal comparison not implemented");
-// }
-//
-// @Override
-// public boolean checkAndPut(byte[] row, byte[] family, byte[] qualifier,
-//                            CompareOperator compareOp, byte[] value, Put put) throws IOException {
-//   throw new IOException("checkAndPut for non-equal comparison not implemented");
-// }
-
  @Override
  public boolean checkAndDelete(byte[] row, byte[] family, byte[] qualifier,
      byte[] value, Delete delete) throws IOException {
@@ -724,7 +634,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    CellSetModel model = buildModelFromPut(put);
    StringBuilder sb = new StringBuilder();
    sb.append('/');
-//   sb.append(Bytes.toString(name));
    sb.append(name);
    sb.append('/');
    sb.append(toURLEncodedBytes(row));
@@ -752,165 +661,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    }
    throw new IOException("checkAndDelete request timed out");
  }
-
-// @Override
-// public boolean checkAndDelete(byte[] row, byte[] family, byte[] qualifier,
-//     CompareOp compareOp, byte[] value, Delete delete) throws IOException {
-//   throw new IOException("checkAndDelete for non-equal comparison not implemented");
-// }
-//
-// @Override
-// public boolean checkAndDelete(byte[] row, byte[] family, byte[] qualifier,
-//                               CompareOperator compareOp, byte[] value, Delete delete) throws IOException {
-//   throw new IOException("checkAndDelete for non-equal comparison not implemented");
-// }
-//
-// @Override
-// public Result increment(Increment increment) throws IOException {
-//   throw new IOException("Increment not supported");
-// }
-//
-// @Override
-// public Result append(Append append) throws IOException {
-//   throw new IOException("Append not supported");
-// }
-//
-// @Override
-// public long incrementColumnValue(byte[] row, byte[] family, byte[] qualifier,
-//     long amount) throws IOException {
-//   throw new IOException("incrementColumnValue not supported");
-// }
-//
-// @Override
-// public long incrementColumnValue(byte[] row, byte[] family, byte[] qualifier,
-//     long amount, Durability durability) throws IOException {
-//   throw new IOException("incrementColumnValue not supported");
-// }
-//
-// @Override
-// public void batch(List<? extends Row> actions, Object[] results) throws IOException {
-//   throw new IOException("batch not supported");
-// }
-//
-// @Override
-// public <R> void batchCallback(List<? extends Row> actions, Object[] results,
-//     Batch.Callback<R> callback) throws IOException, InterruptedException {
-//   throw new IOException("batchCallback not supported");
-// }
-//
-// @Override
-// public CoprocessorRpcChannel coprocessorService(byte[] row) {
-//   throw new UnsupportedOperationException("coprocessorService not implemented");
-// }
-//
-// @Override
-// public <T extends Service, R> Map<byte[], R> coprocessorService(Class<T> service,
-//     byte[] startKey, byte[] endKey, Batch.Call<T, R> callable)
-//     throws ServiceException, Throwable {
-//   throw new UnsupportedOperationException("coprocessorService not implemented");
-// }
-//
-// @Override
-// public <T extends Service, R> void coprocessorService(Class<T> service,
-//     byte[] startKey, byte[] endKey, Batch.Call<T, R> callable, Batch.Callback<R> callback)
-//     throws ServiceException, Throwable {
-//   throw new UnsupportedOperationException("coprocessorService not implemented");
-// }
-//
-// @Override
-// public void mutateRow(RowMutations rm) throws IOException {
-//   throw new IOException("atomicMutation not supported");
-// }
-//
-// @Override
-// public <R extends Message> Map<byte[], R> batchCoprocessorService(
-//     Descriptors.MethodDescriptor method, Message request,
-//     byte[] startKey, byte[] endKey, R responsePrototype) throws ServiceException, Throwable {
-//   throw new UnsupportedOperationException("batchCoprocessorService not implemented");
-// }
-//
-// @Override
-// public <R extends Message> void batchCoprocessorService(
-//     Descriptors.MethodDescriptor method, Message request,
-//     byte[] startKey, byte[] endKey, R responsePrototype, Callback<R> callback)
-//     throws ServiceException, Throwable {
-//   throw new UnsupportedOperationException("batchCoprocessorService not implemented");
-// }
-//
-// @Override public boolean checkAndMutate(byte[] row, byte[] family, byte[] qualifier,
-//     CompareOp compareOp, byte[] value, RowMutations rm) throws IOException {
-//   throw new UnsupportedOperationException("checkAndMutate not implemented");
-// }
-//
-// @Override public boolean checkAndMutate(byte[] row, byte[] family, byte[] qualifier,
-//                                         CompareOperator compareOp, byte[] value, RowMutations rm) throws IOException {
-//   throw new UnsupportedOperationException("checkAndMutate not implemented");
-// }
-//
-// @Override
-// public void setOperationTimeout(int operationTimeout) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// @Deprecated
-// public int getOperationTimeout() {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// @Deprecated
-// public void setRpcTimeout(int rpcTimeout) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// public long getReadRpcTimeout(TimeUnit unit) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// @Deprecated
-// public int getRpcTimeout() {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// public long getRpcTimeout(TimeUnit unit) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// @Deprecated
-// public int getReadRpcTimeout() {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// public void setReadRpcTimeout(int readRpcTimeout) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// public long getWriteRpcTimeout(TimeUnit unit) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// @Deprecated
-// public int getWriteRpcTimeout() {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// public void setWriteRpcTimeout(int writeRpcTimeout) {
-//   throw new UnsupportedOperationException();
-// }
-//
-// @Override
-// public long getOperationTimeout(TimeUnit unit) {
-//   throw new UnsupportedOperationException();
-// }
 
  /*
   * Only a small subset of characters are valid in URLs.

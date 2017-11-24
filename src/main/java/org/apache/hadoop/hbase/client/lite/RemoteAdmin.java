@@ -3,6 +3,11 @@ package org.apache.hadoop.hbase.client.lite;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Access minimal Admin functionality for HBase REST Server
+ * 
+ * Use RemoteAdminBuilder for construction
+ */
 public interface RemoteAdmin {
 	 /**
 	  * @return string representing the rest api's version

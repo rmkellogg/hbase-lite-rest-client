@@ -36,38 +36,12 @@ import org.apache.hadoop.hbase.rest.protobuf.generated.CellMessage.Cell;
 * Representation of a cell. A cell is a single value associated a column and
 * optional qualifier, and either the timestamp when it was stored or the user-
 * provided timestamp if one was explicitly supplied.
-*
-* <pre>
-* &lt;complexType name="Cell"&gt;
-*   &lt;sequence&gt;
-*     &lt;element name="value" maxOccurs="1" minOccurs="1"&gt;
-*       &lt;simpleType&gt;
-*         &lt;restriction base="base64Binary"/&gt;
-*       &lt;/simpleType&gt;
-*     &lt;/element&gt;
-*   &lt;/sequence&gt;
-*   &lt;attribute name="column" type="base64Binary" /&gt;
-*   &lt;attribute name="timestamp" type="int" /&gt;
-* &lt;/complexType&gt;
-* </pre>
 */
-//@XmlRootElement(name="Cell")
-//@XmlAccessorType(XmlAccessType.FIELD)
-//@InterfaceAudience.Private
-//public class CellModel implements ProtobufMessageHandler, Serializable {
 public class CellModel implements ProtobufMessageHandler {
-// private static final long serialVersionUID = 1L;
-
-// @JsonProperty("column")
-// @XmlAttribute
  private byte[] column;
 
-// @JsonProperty("timestamp")
-// @XmlAttribute
  private long timestamp = HConstants.LATEST_TIMESTAMP;
 
-// @JsonProperty("$")
-// @XmlValue
  private byte[] value;
 
  /**
@@ -98,7 +72,6 @@ public class CellModel implements ProtobufMessageHandler {
   * Constructor from KeyValue
   * @param cell
   */
-// public CellModel(org.apache.hadoop.hbase.Cell cell) {
  public CellModel(org.apache.hadoop.hbase.client.lite.Cell cell) {
    this(CellUtil.cloneFamily(cell), CellUtil.cloneQualifier(cell), cell.getTimestamp(), CellUtil
        .cloneValue(cell));

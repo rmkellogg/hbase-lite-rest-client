@@ -18,7 +18,6 @@
 */
 
 package org.apache.hadoop.hbase.client.lite.impl.model;
-//package org.apache.hadoop.hbase.rest.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,19 +33,9 @@ import org.apache.hadoop.hbase.client.lite.impl.ProtobufMessageHandler;
 * row key. RowModels do not appear in results by themselves. They are always
 * encapsulated within CellSetModels.
 */
-//@XmlRootElement(name="Row")
-//@XmlAccessorType(XmlAccessType.FIELD)
-//@InterfaceAudience.Private
 public class RowModel implements ProtobufMessageHandler {
-//public class RowModel implements ProtobufMessageHandler, Serializable {
-// private static final long serialVersionUID = 1L;
-
-// @JsonProperty("key")
-// @XmlAttribute
  private byte[] key;
 
-// @JsonProperty("Cell")
-// @XmlElement(name="Cell")
  private List<CellModel> cells = new ArrayList<>();
 
 

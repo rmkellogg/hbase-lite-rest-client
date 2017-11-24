@@ -32,13 +32,7 @@ import org.apache.hadoop.hbase.rest.protobuf.generated.TableListMessage.TableLis
 /**
 * Simple representation of a list of table names.
 */
-//@XmlRootElement(name="TableList")
-//@InterfaceAudience.Private
-//public class TableListModel implements Serializable, ProtobufMessageHandler {
 public class TableListModel implements ProtobufMessageHandler {
-
-// private static final long serialVersionUID = 1L;
-
  private List<TableModel> tables = new ArrayList<>();
 
  /**
@@ -65,7 +59,6 @@ public class TableListModel implements ProtobufMessageHandler {
  /**
   * @return the tables
   */
-// @XmlElementRef(name="table")
  public List<TableModel> getTables() {
    return tables;
  }

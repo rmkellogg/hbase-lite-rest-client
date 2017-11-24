@@ -26,7 +26,6 @@ import java.util.List;
 * A list of 'host:port' addresses of HTTP servers operating as a single
 * entity, for example multiple redundant web service gateways.
 */
-//@InterfaceAudience.Public
 public class Cluster {
  protected List<String> nodes = 
    Collections.synchronizedList(new ArrayList<String>());

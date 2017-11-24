@@ -17,18 +17,11 @@
 * limitations under the License.
 */
 package org.apache.hadoop.hbase.client.lite.impl.model;
-//package org.apache.hadoop.hbase.rest.model;
 
 /**
 * Simple representation of a table name.
 */
-//@XmlRootElement(name="table")
-//@InterfaceAudience.Private
-//public class TableModel implements Serializable {
 public class TableModel {
-//
-// private static final long serialVersionUID = 1L;
- 
  private String name;
  
  /**
@@ -48,7 +41,6 @@ public class TableModel {
  /**
   * @return the name
   */
-// @XmlAttribute
  public String getName() {
    return name;
  }

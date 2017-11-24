@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * Minimal Table interface to remote tables accessed via REST gateway
+ * 
+ * Use RemoteTHableBuilder for construction
  */
 public interface RemoteHTable {
 	  /**

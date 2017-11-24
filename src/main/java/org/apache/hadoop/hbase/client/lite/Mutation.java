@@ -53,7 +53,6 @@
  * limitations under the License.
  */
 package org.apache.hadoop.hbase.client.lite;
-//package org.apache.hadoop.hbase.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,50 +65,12 @@ import org.apache.hadoop.hbase.client.lite.impl.Bytes;
 import org.apache.hadoop.hbase.client.lite.impl.HConstants;
 import org.apache.hadoop.hbase.client.lite.impl.KeyValue;
 
-//@InterfaceAudience.Public
-//public abstract class Mutation extends OperationWithAttributes implements Row, CellScannable,
-//HeapSize {
 public abstract class Mutation {
-//  public static final long MUTATION_OVERHEAD = ClassSize.align(
-//      // This
-//      ClassSize.OBJECT +
-//      // row + OperationWithAttributes.attributes
-//      2 * ClassSize.REFERENCE +
-//      // Timestamp
-//      1 * Bytes.SIZEOF_LONG +
-//      // durability
-//      ClassSize.REFERENCE +
-//      // familyMap
-//      ClassSize.REFERENCE +
-//      // familyMap
-//      ClassSize.TREEMAP +
-//      // priority
-//      ClassSize.INTEGER
-//  );
-//
-//  /**
-//   * The attribute for storing the list of clusters that have consumed the change.
-//   */
-//  private static final String CONSUMED_CLUSTER_IDS = "_cs.id";
-//
-//  /**
-//   * The attribute for storing TTL for the result of the mutation.
-//   */
-//  private static final String OP_ATTRIBUTE_TTL = "_ttl";
-//
-//  private static final String RETURN_RESULTS = "_rr_";
-
   protected byte [] row = null;
   protected long ts = HConstants.LATEST_TIMESTAMP;
-//  protected Durability durability = Durability.USE_DEFAULT;
 
   // A Map sorted by column family.
   protected NavigableMap<byte [], List<Cell>> familyMap = new TreeMap<>(Bytes.BYTES_COMPARATOR);
-
-//  @Override
-//  public CellScanner cellScanner() {
-//    return CellUtil.createCellScanner(getFamilyCellMap());
-//  }
 
   /**
    * Creates an empty list if one doesn't exist for the given column family
@@ -118,7 +79,6 @@ public abstract class Mutation {
    * @param family column family
    * @return a list of Cell objects, returns an empty list if one doesn't exist.
    */
-//  List<Cell> getCellList(byte[] family) {
   protected List<Cell> getCellList(byte[] family) {
     List<Cell> list = this.familyMap.get(family);
     if (list == null) {
@@ -133,36 +93,9 @@ public abstract class Mutation {
    *
    * @return a KeyValue with this objects row key and the Put identifier.
    */
-//  KeyValue createPutKeyValue(byte[] family, byte[] qualifier, long ts, byte[] value) {
   protected KeyValue createPutKeyValue(byte[] family, byte[] qualifier, long ts, byte[] value) {
     return new KeyValue(this.row, family, qualifier, ts, KeyValue.Type.Put, value);
   }
-//
-//  /**
-//   * Create a KeyValue with this objects row key and the Put identifier.
-//   * @param family
-//   * @param qualifier
-//   * @param ts
-//   * @param value
-//   * @param tags - Specify the Tags as an Array
-//   * @return a KeyValue with this objects row key and the Put identifier.
-//   */
-//  KeyValue createPutKeyValue(byte[] family, byte[] qualifier, long ts, byte[] value, Tag[] tags) {
-//    KeyValue kvWithTag = new KeyValue(this.row, family, qualifier, ts, value, tags);
-//    return kvWithTag;
-//  }
-//
-//  /*
-//   * Create a KeyValue with this objects row key and the Put identifier.
-//   *
-//   * @return a KeyValue with this objects row key and the Put identifier.
-//   */
-//  KeyValue createPutKeyValue(byte[] family, ByteBuffer qualifier, long ts, ByteBuffer value,
-//      Tag[] tags) {
-//    return new KeyValue(this.row, 0, this.row == null ? 0 : this.row.length,
-//        family, 0, family == null ? 0 : family.length,
-//        qualifier, ts, KeyValue.Type.Put, value, tags != null ? Arrays.asList(tags) : null);
-//  }
 
   /**
    * Compile the column family (i.e. schema) information
@@ -170,7 +103,6 @@ public abstract class Mutation {
    * logging, and administration tools.
    * @return Map
    */
-//  @Override
   public Map<String, Object> getFingerprint() {
     Map<String, Object> map = new HashMap<>();
     List<String> families = new ArrayList<>(this.familyMap.entrySet().size());
@@ -183,14 +115,13 @@ public abstract class Mutation {
     return map;
   }
 
-//  /**
-//   * Compile the details beyond the scope of getFingerprint (row, columns,
-//   * timestamps, etc.) into a Map along with the fingerprinted information.
-//   * Useful for debugging, logging, and administration tools.
-//   * @param maxCols a limit on the number of columns output prior to truncation
-//   * @return Map
-//   */
-//  @Override
+  /**
+   * Compile the details beyond the scope of getFingerprint (row, columns,
+   * timestamps, etc.) into a Map along with the fingerprinted information.
+   * Useful for debugging, logging, and administration tools.
+   * @param maxCols a limit on the number of columns output prior to truncation
+   * @return Map
+   */
   public Map<String, Object> toMap(int maxCols) {
     // we start with the fingerprint map and build on top of it.
     Map<String, Object> map = getFingerprint();
@@ -219,16 +150,6 @@ public abstract class Mutation {
       }
     }
     map.put("totalColumns", colCount);
-    // add the id if set
-//    if (getId() != null) {
-//      map.put("id", getId());
-//    }
-    // Add the TTL if set
-    // Long.MAX_VALUE is the default, and is interpreted to mean this attribute
-    // has not been set.
-//    if (getTTL() != Long.MAX_VALUE) {
-//      map.put("ttl", getTTL());
-//    }
     return map;
   }
 
@@ -238,30 +159,8 @@ public abstract class Mutation {
                 c.getQualifierLength()));
     stringMap.put("timestamp", c.getTimestamp());
     stringMap.put("vlen", c.getValueLength());
-//    List<Tag> tags = PrivateCellUtil.getTags(c);
-//    if (tags != null) {
-//      List<String> tagsString = new ArrayList<>(tags.size());
-//      for (Tag t : tags) {
-//        tagsString.add((t.getType()) + ":" + Bytes.toStringBinary(TagUtil.cloneValue(t)));
-//      }
-//      stringMap.put("tag", tagsString);
-//    }
     return stringMap;
   }
-//
-//  /**
-//   * Set the durability for this mutation
-//   * @param d
-//   */
-//  public Mutation setDurability(Durability d) {
-//    this.durability = d;
-//    return this;
-//  }
-//
-//  /** Get the current durability */
-//  public Durability getDurability() {
-//    return this.durability;
-//  }
 
   /**
    * Method for retrieving the put's familyMap
@@ -311,100 +210,6 @@ public abstract class Mutation {
     return this.ts;
   }
 
-//  /**
-//   * Marks that the clusters with the given clusterIds have consumed the mutation
-//   * @param clusterIds of the clusters that have consumed the mutation
-//   */
-//  public Mutation setClusterIds(List<UUID> clusterIds) {
-//    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-//    out.writeInt(clusterIds.size());
-//    for (UUID clusterId : clusterIds) {
-//      out.writeLong(clusterId.getMostSignificantBits());
-//      out.writeLong(clusterId.getLeastSignificantBits());
-//    }
-//    setAttribute(CONSUMED_CLUSTER_IDS, out.toByteArray());
-//    return this;
-//  }
-//
-//  /**
-//   * @return the set of clusterIds that have consumed the mutation
-//   */
-//  public List<UUID> getClusterIds() {
-//    List<UUID> clusterIds = new ArrayList<>();
-//    byte[] bytes = getAttribute(CONSUMED_CLUSTER_IDS);
-//    if(bytes != null) {
-//      ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
-//      int numClusters = in.readInt();
-//      for(int i=0; i<numClusters; i++){
-//        clusterIds.add(new UUID(in.readLong(), in.readLong()));
-//      }
-//    }
-//    return clusterIds;
-//  }
-//
-//  /**
-//   * Sets the visibility expression associated with cells in this Mutation.
-//   * @param expression
-//   */
-//  public Mutation setCellVisibility(CellVisibility expression) {
-//    this.setAttribute(VisibilityConstants.VISIBILITY_LABELS_ATTR_KEY,
-//        toCellVisibility(expression).toByteArray());
-//    return this;
-//  }
-//
-//  /**
-//   * @return CellVisibility associated with cells in this Mutation.
-//   * @throws DeserializationException
-//   */
-//  public CellVisibility getCellVisibility() throws DeserializationException {
-//    byte[] cellVisibilityBytes = this.getAttribute(VisibilityConstants.VISIBILITY_LABELS_ATTR_KEY);
-//    if (cellVisibilityBytes == null) return null;
-//    return toCellVisibility(cellVisibilityBytes);
-//  }
-//
-//  /**
-//   * Create a protocol buffer CellVisibility based on a client CellVisibility.
-//   *
-//   * @param cellVisibility
-//   * @return a protocol buffer CellVisibility
-//   */
-//  static ClientProtos.CellVisibility toCellVisibility(CellVisibility cellVisibility) {
-//    ClientProtos.CellVisibility.Builder builder = ClientProtos.CellVisibility.newBuilder();
-//    builder.setExpression(cellVisibility.getExpression());
-//    return builder.build();
-//  }
-//
-//  /**
-//   * Convert a protocol buffer CellVisibility to a client CellVisibility
-//   *
-//   * @param proto
-//   * @return the converted client CellVisibility
-//   */
-//  private static CellVisibility toCellVisibility(ClientProtos.CellVisibility proto) {
-//    if (proto == null) return null;
-//    return new CellVisibility(proto.getExpression());
-//  }
-//
-//  /**
-//   * Convert a protocol buffer CellVisibility bytes to a client CellVisibility
-//   *
-//   * @param protoBytes
-//   * @return the converted client CellVisibility
-//   * @throws DeserializationException
-//   */
-//  private static CellVisibility toCellVisibility(byte[] protoBytes) throws DeserializationException {
-//    if (protoBytes == null) return null;
-//    ClientProtos.CellVisibility.Builder builder = ClientProtos.CellVisibility.newBuilder();
-//    ClientProtos.CellVisibility proto = null;
-//    try {
-//      ProtobufUtil.mergeFrom(builder, protoBytes);
-//      proto = builder.build();
-//    } catch (IOException e) {
-//      throw new DeserializationException(e);
-//    }
-//    return toCellVisibility(proto);
-//  }
-
   /**
    * Number of KeyValues carried by this Mutation.
    * @return the total number of KeyValues
@@ -423,119 +228,6 @@ public abstract class Mutation {
   public int numFamilies() {
     return familyMap.size();
   }
-
-//  /**
-//   * @return Calculate what Mutation adds to class heap size.
-//   */
-//  @Override
-//  public long heapSize() {
-//    long heapsize = MUTATION_OVERHEAD;
-//    // Adding row
-//    heapsize += ClassSize.align(ClassSize.ARRAY + this.row.length);
-//
-//    // Adding map overhead
-//    heapsize +=
-//      ClassSize.align(this.familyMap.size() * ClassSize.MAP_ENTRY);
-//    for(Map.Entry<byte [], List<Cell>> entry : this.familyMap.entrySet()) {
-//      //Adding key overhead
-//      heapsize +=
-//        ClassSize.align(ClassSize.ARRAY + entry.getKey().length);
-//
-//      //This part is kinds tricky since the JVM can reuse references if you
-//      //store the same value, but have a good match with SizeOf at the moment
-//      //Adding value overhead
-//      heapsize += ClassSize.align(ClassSize.ARRAYLIST);
-//      int size = entry.getValue().size();
-//      heapsize += ClassSize.align(ClassSize.ARRAY +
-//          size * ClassSize.REFERENCE);
-//
-//      for(Cell cell : entry.getValue()) {
-//        heapsize += PrivateCellUtil.estimatedHeapSizeOf(cell);
-//      }
-//    }
-//    heapsize += getAttributeSize();
-//    heapsize += extraHeapSize();
-//    return ClassSize.align(heapsize);
-//  }
-//
-//  /**
-//   * @return The serialized ACL for this operation, or null if none
-//   */
-//  public byte[] getACL() {
-//    return getAttribute(AccessControlConstants.OP_ATTRIBUTE_ACL);
-//  }
-//
-//  /**
-//   * @param user User short name
-//   * @param perms Permissions for the user
-//   */
-//  public Mutation setACL(String user, Permission perms) {
-//    setAttribute(AccessControlConstants.OP_ATTRIBUTE_ACL,
-//      AccessControlUtil.toUsersAndPermissions(user, perms).toByteArray());
-//    return this;
-//  }
-//
-//  /**
-//   * @param perms A map of permissions for a user or users
-//   */
-//  public Mutation setACL(Map<String, Permission> perms) {
-//    ListMultimap<String, Permission> permMap = ArrayListMultimap.create();
-//    for (Map.Entry<String, Permission> entry : perms.entrySet()) {
-//      permMap.put(entry.getKey(), entry.getValue());
-//    }
-//    setAttribute(AccessControlConstants.OP_ATTRIBUTE_ACL,
-//      AccessControlUtil.toUsersAndPermissions(permMap).toByteArray());
-//    return this;
-//  }
-//
-//  /**
-//   * Return the TTL requested for the result of the mutation, in milliseconds.
-//   * @return the TTL requested for the result of the mutation, in milliseconds,
-//   * or Long.MAX_VALUE if unset
-//   */
-//  public long getTTL() {
-//    byte[] ttlBytes = getAttribute(OP_ATTRIBUTE_TTL);
-//    if (ttlBytes != null) {
-//      return Bytes.toLong(ttlBytes);
-//    }
-//    return Long.MAX_VALUE;
-//  }
-//
-//  /**
-//   * Set the TTL desired for the result of the mutation, in milliseconds.
-//   * @param ttl the TTL desired for the result of the mutation, in milliseconds
-//   * @return this
-//   */
-//  public Mutation setTTL(long ttl) {
-//    setAttribute(OP_ATTRIBUTE_TTL, Bytes.toBytes(ttl));
-//    return this;
-//  }
-//
-//  /**
-//   * @return current value for returnResults
-//   */
-//  // Used by Increment and Append only.
-//  @InterfaceAudience.Private
-//  protected boolean isReturnResults() {
-//    byte[] v = getAttribute(RETURN_RESULTS);
-//    return v == null ? true : Bytes.toBoolean(v);
-//  }
-//
-//  @InterfaceAudience.Private
-//  // Used by Increment and Append only.
-//  protected Mutation setReturnResults(boolean returnResults) {
-//    setAttribute(RETURN_RESULTS, Bytes.toBytes(returnResults));
-//    return this;
-//  }
-//
-//  /**
-//   * Subclasses should override this method to add the heap size of their own fields.
-//   * @return the heap size to add (will be aligned).
-//   */
-//  protected long extraHeapSize(){
-//    return 0L;
-//  }
-
 
   /**
    * @param row Row to check
@@ -570,17 +262,4 @@ public abstract class Mutation {
     }
     return row;
   }
-
-//  static void checkRow(ByteBuffer row) {
-//    if (row == null) {
-//      throw new IllegalArgumentException("Row buffer is null");
-//    }
-//    if (row.remaining() == 0) {
-//      throw new IllegalArgumentException("Row length is 0");
-//    }
-//    if (row.remaining() > HConstants.MAX_ROW_LENGTH) {
-//      throw new IllegalArgumentException("Row length " + row.remaining() + " is > " +
-//          HConstants.MAX_ROW_LENGTH);
-//    }
-//  }
 }

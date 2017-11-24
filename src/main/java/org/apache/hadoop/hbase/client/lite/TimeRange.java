@@ -17,7 +17,8 @@
  */
 
 package org.apache.hadoop.hbase.client.lite;
-//package org.apache.hadoop.hbase.io;
+
+import org.apache.hadoop.hbase.client.lite.impl.Bytes;
 
 /**
  * Represents an interval of version timestamps. Presumes timestamps between
@@ -31,7 +32,6 @@ package org.apache.hadoop.hbase.client.lite;
  * Thus, all constructors are purposely @InterfaceAudience.Private.
  *<p>Immutable. Thread-safe.
  */
-//@InterfaceAudience.Public
 public class TimeRange {
   public static final long INITIAL_MIN_TIMESTAMP = 0L;
   public static final long INITIAL_MAX_TIMESTAMP = Long.MAX_VALUE;
@@ -45,59 +45,15 @@ public class TimeRange {
    * @deprecated This is made @InterfaceAudience.Private in the 2.0 line and above and may be
    * changed to private or removed in 3.0.
    */
-//  @Deprecated
-//  @InterfaceAudience.Private
   public TimeRange() {
     this(INITIAL_MIN_TIMESTAMP, INITIAL_MAX_TIMESTAMP);
   }
-//
-//  /**
-//   * Represents interval [minStamp, Long.MAX_VALUE)
-//   * @param minStamp the minimum timestamp value, inclusive
-//   * @deprecated This is made @InterfaceAudience.Private in the 2.0 line and above and may be
-//   * changed to private or removed in 3.0.
-//   */
-//  @Deprecated
-//  @InterfaceAudience.Private
-//  public TimeRange(long minStamp) {
-//    this(minStamp, INITIAL_MAX_TIMESTAMP);
-//  }
-//
-//  /**
-//   * Represents interval [minStamp, Long.MAX_VALUE)
-//   * @param minStamp the minimum timestamp value, inclusive
-//   * @deprecated This is made @InterfaceAudience.Private in the 2.0 line and above and may be
-//   * changed to private or removed in 3.0.
-//   */
-//  @Deprecated
-//  @InterfaceAudience.Private
-//  public TimeRange(byte [] minStamp) {
-//    this(Bytes.toLong(minStamp));
-//  }
-//
-//  /**
-//   * Represents interval [minStamp, maxStamp)
-//   * @param minStamp the minimum timestamp, inclusive
-//   * @param maxStamp the maximum timestamp, exclusive
-//   * @deprecated This is made @InterfaceAudience.Private in the 2.0 line and above and may be
-//   * changed to private or removed in 3.0.
-//   */
-//  @Deprecated
-//  @InterfaceAudience.Private
-//  public TimeRange(byte [] minStamp, byte [] maxStamp) {
-//    this(Bytes.toLong(minStamp), Bytes.toLong(maxStamp));
-//  }
-//
   /**
    * Represents interval [minStamp, maxStamp)
    * @param minStamp the minimum timestamp, inclusive
    * @param maxStamp the maximum timestamp, exclusive
    * @throws IllegalArgumentException if either <0,
-   * @deprecated This is made @InterfaceAudience.Private in the 2.0 line and above and may be
-   * changed to private or removed in 3.0.
    */
-//  @Deprecated
-//  @InterfaceAudience.Private
   public TimeRange(long minStamp, long maxStamp) {
     check(minStamp, maxStamp);
     this.minStamp = minStamp;
@@ -141,20 +97,20 @@ public class TimeRange {
     return allTime;
   }
 
-//  /**
-//   * Check if the specified timestamp is within this TimeRange.
-//   * <p>
-//   * Returns true if within interval [minStamp, maxStamp), false if not.
-//   * @param bytes timestamp to check
-//   * @param offset offset into the bytes
-//   * @return true if within TimeRange, false if not
-//   */
-//  public boolean withinTimeRange(byte [] bytes, int offset) {
-//    if (allTime) {
-//      return true;
-//    }
-//    return withinTimeRange(Bytes.toLong(bytes, offset));
-//  }
+  /**
+   * Check if the specified timestamp is within this TimeRange.
+   * <p>
+   * Returns true if within interval [minStamp, maxStamp), false if not.
+   * @param bytes timestamp to check
+   * @param offset offset into the bytes
+   * @return true if within TimeRange, false if not
+   */
+  public boolean withinTimeRange(byte [] bytes, int offset) {
+    if (allTime) {
+      return true;
+    }
+    return withinTimeRange(Bytes.toLong(bytes, offset));
+  }
 
   /**
    * Check if the specified timestamp is within this TimeRange.

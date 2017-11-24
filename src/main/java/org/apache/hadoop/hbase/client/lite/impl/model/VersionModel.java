@@ -40,13 +40,7 @@ import org.apache.hadoop.hbase.rest.protobuf.generated.VersionMessage.Version;
 * <li>jerseyVersion: the version of the embedded Jersey framework</li>
 * </ul>
 */
-//@XmlRootElement(name="Version")
-//@InterfaceAudience.Private
-//public class VersionModel implements Serializable, ProtobufMessageHandler {
 public class VersionModel implements ProtobufMessageHandler {
-
-// private static final long serialVersionUID = 1L;
-
  private String restVersion;
  private String jvmVersion;
  private String osVersion;
@@ -58,27 +52,9 @@ public class VersionModel implements ProtobufMessageHandler {
   */
  public VersionModel() {}
 
-// /**
-//  * Constructor
-//  * @param context the servlet context
-//  */
-// public VersionModel(ServletContext context) {
-//   restVersion = RESTServlet.VERSION_STRING;
-//   jvmVersion = System.getProperty("java.vm.vendor") + ' ' +
-//     System.getProperty("java.version") + '-' +
-//     System.getProperty("java.vm.version");
-//   osVersion = System.getProperty("os.name") + ' ' +
-//     System.getProperty("os.version") + ' ' +
-//     System.getProperty("os.arch");
-//   serverVersion = context.getServerInfo();
-//   jerseyVersion = ServletContainer.class.getClass().getPackage()
-//     .getImplementationVersion();
-// }
-
  /**
   * @return the REST gateway version
   */
-// @XmlAttribute(name="REST")
  public String getRESTVersion() {
    return restVersion;
  }
@@ -86,7 +62,6 @@ public class VersionModel implements ProtobufMessageHandler {
  /**
   * @return the JVM vendor and version
   */
-// @XmlAttribute(name="JVM")
  public String getJVMVersion() {
    return jvmVersion;
  }
@@ -94,7 +69,6 @@ public class VersionModel implements ProtobufMessageHandler {
  /**
   * @return the OS name, version, and hardware architecture
   */
-// @XmlAttribute(name="OS")
  public String getOSVersion() {
    return osVersion;
  }
@@ -102,7 +76,6 @@ public class VersionModel implements ProtobufMessageHandler {
  /**
   * @return the servlet container version
   */
-// @XmlAttribute(name="Server")
  public String getServerVersion() {
    return serverVersion;
  }
@@ -110,7 +83,6 @@ public class VersionModel implements ProtobufMessageHandler {
  /**
   * @return the version of the embedded Jersey framework
   */
-// @XmlAttribute(name="Jersey")
  public String getJerseyVersion() {
    return jerseyVersion;
  }
