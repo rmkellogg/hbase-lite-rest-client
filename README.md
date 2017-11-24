@@ -1,5 +1,5 @@
 # hbase-lite-rest-client
-Apache Lite HBase REST Client 
+Apache HBase Lite REST Client 
 
 Provides a REST Client to Apache HBase 1.x/2.x using a minimal set of external dependencies.
 
