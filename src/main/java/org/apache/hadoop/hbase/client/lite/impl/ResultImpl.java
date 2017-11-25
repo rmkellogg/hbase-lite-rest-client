@@ -60,10 +60,6 @@ import org.apache.hadoop.hbase.client.lite.Result;
 * {@link #current()} to iterate over Cells as you would any {@link CellScanner}.
 * Call {@link #cellScanner()} to reset should you need to iterate the same Result over again
 * ({@link CellScanner}s are one-shot).
-*
-* If you need to overwrite a Result with another Result instance -- as in the old 'mapred'
-* RecordReader next invocations -- then create an empty Result with the null constructor and
-* in then use {@link #copyFrom(ResultImpl)}
 */
 public class ResultImpl implements Result {
  private Cell[] cells;

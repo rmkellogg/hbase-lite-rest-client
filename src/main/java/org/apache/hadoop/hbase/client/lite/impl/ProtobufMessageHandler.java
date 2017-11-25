@@ -26,7 +26,6 @@ import java.io.IOException;
 * and unmarshalling. Hooks up to the ProtobufMessageBodyConsumer and
 * ProtobufMessageBodyProducer adapters. 
 */
-//@InterfaceAudience.Private
 public interface ProtobufMessageHandler {
  /**
   * @return the protobuf represention of the model

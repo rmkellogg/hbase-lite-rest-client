@@ -15,10 +15,6 @@ public class PrivateCellUtil {
 
 	  public static boolean matchingRows(final Cell left, final byte[] buf, final int offset,
 		      final int length) {
-//		    if (left instanceof ByteBufferCell) {
-//		      return ByteBufferUtils.equals(((ByteBufferCell) left).getRowByteBuffer(),
-//		        ((ByteBufferCell) left).getRowPosition(), left.getRowLength(), buf, offset, length);
-//		    }
 		    return Bytes.equals(left.getRowArray(), left.getRowOffset(), left.getRowLength(), buf, offset,
 		      length);
 		  }
@@ -51,12 +47,6 @@ public class PrivateCellUtil {
 	   * that are returned back to the clients
 	   */
 	  private static abstract class EmptyCell implements Cell {
-
-//	    @Override
-//	    public void setSequenceId(long seqId) {
-//	      // Fake cells don't need seqId, so leaving it as a noop.
-//	    }
-
 	    @Override
 	    public byte[] getRowArray() {
 	      return HConstants.EMPTY_BYTE_ARRAY;
@@ -224,5 +214,4 @@ public class PrivateCellUtil {
 		      return this.qlength;
 		    }
 		  }	  
-	  
 }

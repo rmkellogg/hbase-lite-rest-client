@@ -19,15 +19,8 @@
 //package org.apache.hadoop.hbase.client;
 package org.apache.hadoop.hbase.client.lite.impl;
 
-//@InterfaceAudience.Private
 public class ClientUtil {
-
-
   public static boolean areScanStartRowAndStopRowEqual(byte[] startRow, byte[] stopRow) {
     return startRow != null && startRow.length > 0 && Bytes.equals(startRow, stopRow);
   }
-
-//  public static Cursor createCursor(byte[] row) {
-//    return new Cursor(row);
-//  }
 }

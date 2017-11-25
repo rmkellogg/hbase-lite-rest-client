@@ -191,35 +191,6 @@ public class CellUtil {
 	    return CellComparatorImpl.COMPARATOR.compareTimestamps(a.getTimestamp(), b.getTimestamp()) == 0;
 	  }
 
-//	  /**
-//	   * @deprecated As of HBase-2.0. Will be removed in HBase-3.0
-//	   */
-//	  @Deprecated
-//	  public static boolean matchingType(Cell a, Cell b) {
-//	    return a.getTypeByte() == b.getTypeByte();
-//	  }
-//
-//	  /**
-//	   * @param left
-//	   * @param right
-//	   * @return True if the rows in <code>left</code> and <code>right</code> Cells match
-//	   * @deprecated As of release 2.0.0, this will be removed in HBase 3.0.0. Instead use
-//	   *             {@link #matchingRows(Cell, Cell)}
-//	   */
-//	  @Deprecated
-//	  public static boolean matchingRow(final Cell left, final Cell right) {
-//	    return matchingRows(left, right);
-//	  }
-//
-//	  /**
-//	   * @deprecated As of release 2.0.0, this will be removed in HBase 3.0.0. Instead use
-//	   *             {@link #matchingRows(Cell, byte[]))}
-//	   */
-//	  @Deprecated
-//	  public static boolean matchingRow(final Cell left, final byte[] buf) {
-//	    return matchingRows(left, buf);
-//	  }
-
 	  public static boolean matchingRows(final Cell left, final byte[] buf) {
 	    if (buf == null) {
 	      return left.getRowLength() == 0;
@@ -237,83 +208,13 @@ public class CellUtil {
 	    short lrowlength = left.getRowLength();
 	    short rrowlength = right.getRowLength();
 	    if (lrowlength != rrowlength) return false;
-//	    if (left instanceof ByteBufferCell && right instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) left).getRowByteBuffer(),
-//	        ((ByteBufferCell) left).getRowPosition(), lrowlength,
-//	        ((ByteBufferCell) right).getRowByteBuffer(), ((ByteBufferCell) right).getRowPosition(),
-//	        rrowlength);
-//	    }
-//	    if (left instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) left).getRowByteBuffer(),
-//	        ((ByteBufferCell) left).getRowPosition(), lrowlength, right.getRowArray(),
-//	        right.getRowOffset(), rrowlength);
-//	    }
-//	    if (right instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) right).getRowByteBuffer(),
-//	        ((ByteBufferCell) right).getRowPosition(), rrowlength, left.getRowArray(),
-//	        left.getRowOffset(), lrowlength);
-//	    }
 	    return Bytes.equals(left.getRowArray(), left.getRowOffset(), lrowlength, right.getRowArray(),
 	      right.getRowOffset(), rrowlength);
 	  }
 
-//	  /**
-//	   * Compares the row and column of two keyvalues for equality
-//	   * @param left
-//	   * @param right
-//	   * @return True if same row and column.
-//	   */
-//	  public static boolean matchingRowColumn(final Cell left, final Cell right) {
-//	    if ((left.getRowLength() + left.getFamilyLength()
-//	        + left.getQualifierLength()) != (right.getRowLength() + right.getFamilyLength()
-//	            + right.getQualifierLength())) {
-//	      return false;
-//	    }
-//
-//	    if (!matchingRows(left, right)) {
-//	      return false;
-//	    }
-//	    return matchingColumn(left, right);
-//	  }
-//
-//	  /**
-//	   * Compares the cell's qualifier with the given byte[]
-//	   * @param left the cell for which the qualifier has to be compared
-//	   * @param right the byte[] having the qualifier
-//	   * @param rOffset the offset of the qualifier
-//	   * @param rLength the length of the qualifier
-//	   * @return greater than 0 if left cell's qualifier is bigger than byte[], lesser than 0 if left
-//	   *         cell's qualifier is lesser than byte[] and 0 otherwise
-//	   */
-//	  public final static int compareQualifiers(Cell left, byte[] right, int rOffset, int rLength) {
-//	    if (left instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getQualifierByteBuffer(),
-//	        ((ByteBufferCell) left).getQualifierPosition(), left.getQualifierLength(), right, rOffset,
-//	        rLength);
-//	    }
-//	    return Bytes.compareTo(left.getQualifierArray(), left.getQualifierOffset(),
-//	      left.getQualifierLength(), right, rOffset, rLength);
-//	  }
-
 	  public static boolean matchingFamily(final Cell left, final Cell right) {
 		    byte lfamlength = left.getFamilyLength();
 		    byte rfamlength = right.getFamilyLength();
-//		    if (left instanceof ByteBufferCell && right instanceof ByteBufferCell) {
-//		      return ByteBufferUtils.equals(((ByteBufferCell) left).getFamilyByteBuffer(),
-//		        ((ByteBufferCell) left).getFamilyPosition(), lfamlength,
-//		        ((ByteBufferCell) right).getFamilyByteBuffer(),
-//		        ((ByteBufferCell) right).getFamilyPosition(), rfamlength);
-//		    }
-//		    if (left instanceof ByteBufferCell) {
-//		      return ByteBufferUtils.equals(((ByteBufferCell) left).getFamilyByteBuffer(),
-//		        ((ByteBufferCell) left).getFamilyPosition(), lfamlength, right.getFamilyArray(),
-//		        right.getFamilyOffset(), rfamlength);
-//		    }
-//		    if (right instanceof ByteBufferCell) {
-//		      return ByteBufferUtils.equals(((ByteBufferCell) right).getFamilyByteBuffer(),
-//		        ((ByteBufferCell) right).getFamilyPosition(), rfamlength, left.getFamilyArray(),
-//		        left.getFamilyOffset(), lfamlength);
-//		    }
 		    return Bytes.equals(left.getFamilyArray(), left.getFamilyOffset(), lfamlength,
 		      right.getFamilyArray(), right.getFamilyOffset(), rfamlength);
 		  }
@@ -325,80 +226,10 @@ public class CellUtil {
 		    return PrivateCellUtil.matchingFamily(left, buf, 0, buf.length);
 		  }
 
-//		  /**
-//		   * @deprecated As of release 2.0.0, this will be removed in HBase 3.0.0.
-//		   */
-//		  @Deprecated
-//		  public static boolean matchingFamily(final Cell left, final byte[] buf, final int offset,
-//		      final int length) {
-//		    if (left instanceof ByteBufferCell) {
-//		      return ByteBufferUtils.equals(((ByteBufferCell) left).getFamilyByteBuffer(),
-//		        ((ByteBufferCell) left).getFamilyPosition(), left.getFamilyLength(), buf, offset, length);
-//		    }
-//		    return Bytes.equals(left.getFamilyArray(), left.getFamilyOffset(), left.getFamilyLength(), buf,
-//		      offset, length);
-//		  }
-
 	  public static boolean matchingQualifier(final Cell left, final Cell right) {
 	    int lqlength = left.getQualifierLength();
 	    int rqlength = right.getQualifierLength();
-//	    if (left instanceof ByteBufferCell && right instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) left).getQualifierByteBuffer(),
-//	        ((ByteBufferCell) left).getQualifierPosition(), lqlength,
-//	        ((ByteBufferCell) right).getQualifierByteBuffer(),
-//	        ((ByteBufferCell) right).getQualifierPosition(), rqlength);
-//	    }
-//	    if (left instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) left).getQualifierByteBuffer(),
-//	        ((ByteBufferCell) left).getQualifierPosition(), lqlength, right.getQualifierArray(),
-//	        right.getQualifierOffset(), rqlength);
-//	    }
-//	    if (right instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) right).getQualifierByteBuffer(),
-//	        ((ByteBufferCell) right).getQualifierPosition(), rqlength, left.getQualifierArray(),
-//	        left.getQualifierOffset(), lqlength);
-//	    }
 	    return Bytes.equals(left.getQualifierArray(), left.getQualifierOffset(), lqlength,
 	      right.getQualifierArray(), right.getQualifierOffset(), rqlength);
 	  }
-
-//	  /**
-//	   * Finds if the qualifier part of the cell and the KV serialized byte[] are equal
-//	   * @param left
-//	   * @param buf the serialized keyvalue format byte[]
-//	   * @param offset the offset of the qualifier in the byte[]
-//	   * @param length the length of the qualifier in the byte[]
-//	   * @return true if the qualifier matches, false otherwise
-//	   * @deprecated As of release 2.0.0, this will be removed in HBase 3.0.0.
-//	   */
-//	  @Deprecated
-//	  public static boolean matchingQualifier(final Cell left, final byte[] buf, final int offset,
-//	      final int length) {
-//	    if (buf == null) {
-//	      return left.getQualifierLength() == 0;
-//	    }
-//	    if (left instanceof ByteBufferCell) {
-//	      return ByteBufferUtils.equals(((ByteBufferCell) left).getQualifierByteBuffer(),
-//	        ((ByteBufferCell) left).getQualifierPosition(), left.getQualifierLength(), buf, offset,
-//	        length);
-//	    }
-//	    return Bytes.equals(left.getQualifierArray(), left.getQualifierOffset(),
-//	      left.getQualifierLength(), buf, offset, length);
-//	  }
-//
-//	  /**
-//	   * @deprecated As of release 2.0.0, this will be removed in HBase 3.0.0.
-//	   */
-//	  @Deprecated
-//	  public static boolean matchingColumn(final Cell left, final byte[] fam, final int foffset,
-//	      final int flength, final byte[] qual, final int qoffset, final int qlength) {
-//	    if (!PrivateCellUtil.matchingFamily(left, fam, foffset, flength)) return false;
-//	    return PrivateCellUtil.matchingQualifier(left, qual, qoffset, qlength);
-//	  }
-//
-//	  public static boolean matchingColumn(final Cell left, final Cell right) {
-//	    if (!matchingFamily(left, right)) return false;
-//	    return matchingQualifier(left, right);
-//	  }
-
 }

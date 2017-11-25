@@ -8,8 +8,6 @@ import org.apache.hadoop.hbase.client.lite.Cell;
  * Comparator for comparing cells and has some specialized methods that allows comparing individual
  * cell components like row, family, qualifier and timestamp
  */
-//@InterfaceAudience.LimitedPrivate(HBaseInterfaceAudience.COPROC)
-//@InterfaceStability.Evolving
 public interface CellComparator extends Comparator<Cell> {
 
   /**
