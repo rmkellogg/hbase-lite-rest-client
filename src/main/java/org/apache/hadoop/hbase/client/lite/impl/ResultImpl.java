@@ -17,7 +17,6 @@
 * limitations under the License.
 */
 package org.apache.hadoop.hbase.client.lite.impl;
-//package org.apache.hadoop.hbase.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,8 +64,6 @@ import org.apache.hadoop.hbase.client.lite.Result;
 * RecordReader next invocations -- then create an empty Result with the null constructor and
 * in then use {@link #copyFrom(ResultImpl)}
 */
-//@InterfaceAudience.Public
-//public class Result implements CellScannable, CellScanner {
 public class ResultImpl implements Result {
  private Cell[] cells;
  private Boolean exists; // if the query was just to check existence.
@@ -83,17 +80,7 @@ public class ResultImpl implements Result {
  private transient NavigableMap<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>>
      familyMap = null;
 
-// private static ThreadLocal<byte[]> localBuffer = new ThreadLocal<>();
-// private static final int PAD_WIDTH = 128;
  public static final ResultImpl EMPTY_RESULT = new ResultImpl(true);
-
-// private final static int INITIAL_CELLSCANNER_INDEX = -1;
-//
-// /**
-//  * Index for where we are when Result is acting as a {@link CellScanner}.
-//  */
-// private int cellScannerIndex = INITIAL_CELLSCANNER_INDEX;
-// private RegionLoadStats stats;
 
  private final boolean readonly;
 
@@ -163,15 +150,6 @@ public class ResultImpl implements Result {
    }
    return new ResultImpl(cells, null, stale, mayHaveMoreCellsInRow);
  }
-
-// public static Result createCursorResult(Cursor cursor) {
-//   return new Result(cursor);
-// }
-//
-// private Result(Cursor cursor) {
-//   this.cursor = cursor;
-//   this.readonly = false;
-// }
 
  /** Private ctor. Use {@link #create(Cell[])}. */
  private ResultImpl(Cell[] cells, Boolean exists, boolean stale, boolean mayHaveMoreCellsInRow) {
@@ -302,51 +280,6 @@ public class ResultImpl implements Result {
    return pos;
  }
 
-// /**
-//  * Searches for the latest value for the specified column.
-//  *
-//  * @param kvs the array to search
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  *
-//  * @return the index where the value was found, or -1 otherwise
-//  */
-// protected int binarySearch(final Cell [] kvs,
-//     final byte [] family, final int foffset, final int flength,
-//     final byte [] qualifier, final int qoffset, final int qlength) {
-//
-//   double keyValueSize = (double)
-//       KeyValue.getKeyValueDataStructureSize(kvs[0].getRowLength(), flength, qlength, 0);
-//
-//   byte[] buffer = localBuffer.get();
-//   if (buffer == null || keyValueSize > buffer.length) {
-//     // pad to the smallest multiple of the pad width
-//     buffer = new byte[(int) Math.ceil(keyValueSize / PAD_WIDTH) * PAD_WIDTH];
-//     localBuffer.set(buffer);
-//   }
-//
-//   Cell searchTerm = KeyValueUtil.createFirstOnRow(buffer, 0,
-//       kvs[0].getRowArray(), kvs[0].getRowOffset(), kvs[0].getRowLength(),
-//       family, foffset, flength,
-//       qualifier, qoffset, qlength);
-//
-//   // pos === ( -(insertion point) - 1)
-//   int pos = Arrays.binarySearch(kvs, searchTerm, CellComparatorImpl.COMPARATOR);
-//   // never will exact match
-//   if (pos < 0) {
-//     pos = (pos+1) * -1;
-//     // pos is now insertion point
-//   }
-//   if (pos == kvs.length) {
-//     return -1; // doesn't exist
-//   }
-//   return pos;
-// }
-
  /**
   * The Cell for the most recent timestamp for a given column.
   *
@@ -371,37 +304,6 @@ public class ResultImpl implements Result {
    return null;
  }
 
-// /**
-//  * The Cell for the most recent timestamp for a given column.
-//  *
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  *
-//  * @return the Cell for the column, or null if no value exists in the row or none have been
-//  * selected in the query (Get/Scan)
-//  */
-// public Cell getColumnLatestCell(byte [] family, int foffset, int flength,
-//     byte [] qualifier, int qoffset, int qlength) {
-//
-//   Cell [] kvs = rawCells(); // side effect possibly.
-//   if (kvs == null || kvs.length == 0) {
-//     return null;
-//   }
-//   int pos = binarySearch(kvs, family, foffset, flength, qualifier, qoffset, qlength);
-//   if (pos == -1) {
-//     return null;
-//   }
-//   if (PrivateCellUtil.matchingColumn(kvs[pos], family, foffset, flength, qualifier, qoffset,
-//     qlength)) {
-//     return kvs[pos];
-//   }
-//   return null;
-// }
-
  /**
   * Get the latest version of the specified column.
   * Note: this call clones the value content of the hosting Cell. See
@@ -419,161 +321,6 @@ public class ResultImpl implements Result {
    return CellUtil.cloneValue(kv);
  }
 
-// /**
-//  * Returns the value wrapped in a new <code>ByteBuffer</code>.
-//  *
-//  * @param family family name
-//  * @param qualifier column qualifier
-//  *
-//  * @return the latest version of the column, or <code>null</code> if none found
-//  */
-// public ByteBuffer getValueAsByteBuffer(byte [] family, byte [] qualifier) {
-//
-//   Cell kv = getColumnLatestCell(family, 0, family.length, qualifier, 0, qualifier.length);
-//
-//   if (kv == null) {
-//     return null;
-//   }
-//   return ByteBuffer.wrap(kv.getValueArray(), kv.getValueOffset(), kv.getValueLength()).
-//     asReadOnlyBuffer();
-// }
-//
-// /**
-//  * Returns the value wrapped in a new <code>ByteBuffer</code>.
-//  *
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  *
-//  * @return the latest version of the column, or <code>null</code> if none found
-//  */
-// public ByteBuffer getValueAsByteBuffer(byte [] family, int foffset, int flength,
-//     byte [] qualifier, int qoffset, int qlength) {
-//
-//   Cell kv = getColumnLatestCell(family, foffset, flength, qualifier, qoffset, qlength);
-//
-//   if (kv == null) {
-//     return null;
-//   }
-//   return ByteBuffer.wrap(kv.getValueArray(), kv.getValueOffset(), kv.getValueLength()).
-//     asReadOnlyBuffer();
-// }
-//
-// /**
-//  * Loads the latest version of the specified column into the provided <code>ByteBuffer</code>.
-//  * <p>
-//  * Does not clear or flip the buffer.
-//  *
-//  * @param family family name
-//  * @param qualifier column qualifier
-//  * @param dst the buffer where to write the value
-//  *
-//  * @return <code>true</code> if a value was found, <code>false</code> otherwise
-//  *
-//  * @throws BufferOverflowException there is insufficient space remaining in the buffer
-//  */
-// public boolean loadValue(byte [] family, byte [] qualifier, ByteBuffer dst)
-//         throws BufferOverflowException {
-//   return loadValue(family, 0, family.length, qualifier, 0, qualifier.length, dst);
-// }
-//
-// /**
-//  * Loads the latest version of the specified column into the provided <code>ByteBuffer</code>.
-//  * <p>
-//  * Does not clear or flip the buffer.
-//  *
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  * @param dst the buffer where to write the value
-//  *
-//  * @return <code>true</code> if a value was found, <code>false</code> otherwise
-//  *
-//  * @throws BufferOverflowException there is insufficient space remaining in the buffer
-//  */
-// public boolean loadValue(byte [] family, int foffset, int flength,
-//     byte [] qualifier, int qoffset, int qlength, ByteBuffer dst)
-//         throws BufferOverflowException {
-//   Cell kv = getColumnLatestCell(family, foffset, flength, qualifier, qoffset, qlength);
-//
-//   if (kv == null) {
-//     return false;
-//   }
-//   dst.put(kv.getValueArray(), kv.getValueOffset(), kv.getValueLength());
-//   return true;
-// }
-//
-// /**
-//  * Checks if the specified column contains a non-empty value (not a zero-length byte array).
-//  *
-//  * @param family family name
-//  * @param qualifier column qualifier
-//  *
-//  * @return whether or not a latest value exists and is not empty
-//  */
-// public boolean containsNonEmptyColumn(byte [] family, byte [] qualifier) {
-//
-//   return containsNonEmptyColumn(family, 0, family.length, qualifier, 0, qualifier.length);
-// }
-//
-// /**
-//  * Checks if the specified column contains a non-empty value (not a zero-length byte array).
-//  *
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  *
-//  * @return whether or not a latest value exists and is not empty
-//  */
-// public boolean containsNonEmptyColumn(byte [] family, int foffset, int flength,
-//     byte [] qualifier, int qoffset, int qlength) {
-//
-//   Cell kv = getColumnLatestCell(family, foffset, flength, qualifier, qoffset, qlength);
-//
-//   return (kv != null) && (kv.getValueLength() > 0);
-// }
-//
-// /**
-//  * Checks if the specified column contains an empty value (a zero-length byte array).
-//  *
-//  * @param family family name
-//  * @param qualifier column qualifier
-//  *
-//  * @return whether or not a latest value exists and is empty
-//  */
-// public boolean containsEmptyColumn(byte [] family, byte [] qualifier) {
-//
-//   return containsEmptyColumn(family, 0, family.length, qualifier, 0, qualifier.length);
-// }
-//
-// /**
-//  * Checks if the specified column contains an empty value (a zero-length byte array).
-//  *
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  *
-//  * @return whether or not a latest value exists and is empty
-//  */
-// public boolean containsEmptyColumn(byte [] family, int foffset, int flength,
-//     byte [] qualifier, int qoffset, int qlength) {
-//   Cell kv = getColumnLatestCell(family, foffset, flength, qualifier, qoffset, qlength);
-//
-//   return (kv != null) && (kv.getValueLength() == 0);
-// }
-
  /**
   * Checks for existence of a value for the specified column (empty or not).
   *
@@ -586,24 +333,6 @@ public class ResultImpl implements Result {
    Cell kv = getColumnLatestCell(family, qualifier);
    return kv != null;
  }
-
-// /**
-//  * Checks for existence of a value for the specified column (empty or not).
-//  *
-//  * @param family family name
-//  * @param foffset family offset
-//  * @param flength family length
-//  * @param qualifier column qualifier
-//  * @param qoffset qualifier offset
-//  * @param qlength qualifier length
-//  *
-//  * @return true if at least one value exists in the result, false if not
-//  */
-// public boolean containsColumn(byte [] family, int foffset, int flength,
-//     byte [] qualifier, int qoffset, int qlength) {
-//
-//   return getColumnLatestCell(family, foffset, flength, qualifier, qoffset, qlength) != null;
-// }
 
  /**
   * Map of families to all versions of its qualifiers and values.
@@ -758,140 +487,6 @@ public class ResultImpl implements Result {
    return sb.toString();
  }
 
-// /**
-//  * Does a deep comparison of two Results, down to the byte arrays.
-//  * @param res1 first result to compare
-//  * @param res2 second result to compare
-//  * @throws Exception Every difference is throwing an exception
-//  */
-// public static void compareResults(Result res1, Result res2)
-//     throws Exception {
-//   if (res2 == null) {
-//     throw new Exception("There wasn't enough rows, we stopped at "
-//         + Bytes.toStringBinary(res1.getRow()));
-//   }
-//   if (res1.size() != res2.size()) {
-//     throw new Exception("This row doesn't have the same number of KVs: "
-//         + res1.toString() + " compared to " + res2.toString());
-//   }
-//   Cell[] ourKVs = res1.rawCells();
-//   Cell[] replicatedKVs = res2.rawCells();
-//   for (int i = 0; i < res1.size(); i++) {
-//     if (!ourKVs[i].equals(replicatedKVs[i]) ||
-//         !CellUtil.matchingValue(ourKVs[i], replicatedKVs[i])) {
-//       throw new Exception("This result was different: "
-//           + res1.toString() + " compared to " + res2.toString());
-//     }
-//   }
-// }
-//
-// /**
-//  * Forms a single result from the partial results in the partialResults list. This method is
-//  * useful for reconstructing partial results on the client side.
-//  * @param partialResults list of partial results
-//  * @return The complete result that is formed by combining all of the partial results together
-//  * @throws IOException A complete result cannot be formed because the results in the partial list
-//  *           come from different rows
-//  */
-// public static Result createCompleteResult(Iterable<Result> partialResults)
-//     throws IOException {
-//   if (partialResults == null) {
-//     return Result.create(Collections.emptyList(), null, false);
-//   }
-//   List<Cell> cells = new ArrayList<>();
-//   boolean stale = false;
-//   byte[] prevRow = null;
-//   byte[] currentRow = null;
-//   for (Iterator<Result> iter = partialResults.iterator(); iter.hasNext();) {
-//     Result r = iter.next();
-//     currentRow = r.getRow();
-//     if (prevRow != null && !Bytes.equals(prevRow, currentRow)) {
-//       throw new IOException(
-//           "Cannot form complete result. Rows of partial results do not match." +
-//               " Partial Results: " + partialResults);
-//     }
-//     // Ensure that all Results except the last one are marked as partials. The last result
-//     // may not be marked as a partial because Results are only marked as partials when
-//     // the scan on the server side must be stopped due to reaching the maxResultSize.
-//     // Visualizing it makes it easier to understand:
-//     // maxResultSize: 2 cells
-//     // (-x-) represents cell number x in a row
-//     // Example: row1: -1- -2- -3- -4- -5- (5 cells total)
-//     // How row1 will be returned by the server as partial Results:
-//     // Result1: -1- -2- (2 cells, size limit reached, mark as partial)
-//     // Result2: -3- -4- (2 cells, size limit reached, mark as partial)
-//     // Result3: -5- (1 cell, size limit NOT reached, NOT marked as partial)
-//     if (iter.hasNext() && !r.mayHaveMoreCellsInRow()) {
-//       throw new IOException("Cannot form complete result. Result is missing partial flag. " +
-//           "Partial Results: " + partialResults);
-//     }
-//     prevRow = currentRow;
-//     stale = stale || r.isStale();
-//     for (Cell c : r.rawCells()) {
-//       cells.add(c);
-//     }
-//   }
-//
-//   return Result.create(cells, null, stale);
-// }
-
-// /**
-//  * Get total size of raw cells
-//  * @param result
-//  * @return Total size.
-//  */
-// public static long getTotalSizeOfCells(Result result) {
-//   long size = 0;
-//   if (result.isEmpty()) {
-//     return size;
-//   }
-//   for (Cell c : result.rawCells()) {
-//     size += PrivateCellUtil.estimatedHeapSizeOf(c);
-//   }
-//   return size;
-// }
-//
-// /**
-//  * Copy another Result into this one. Needed for the old Mapred framework
-//  * @throws UnsupportedOperationException if invoked on instance of EMPTY_RESULT
-//  * (which is supposed to be immutable).
-//  * @param other
-//  */
-// public void copyFrom(Result other) {
-//   checkReadonly();
-//   this.row = null;
-//   this.familyMap = null;
-//   this.cells = other.cells;
-// }
-//
-// @Override
-// public CellScanner cellScanner() {
-//   // Reset
-//   this.cellScannerIndex = INITIAL_CELLSCANNER_INDEX;
-//   return this;
-// }
-//
-// @Override
-// public Cell current() {
-//   if (cells == null
-//           || cellScannerIndex == INITIAL_CELLSCANNER_INDEX
-//           || cellScannerIndex >= cells.length)
-//     return null;
-//   return this.cells[cellScannerIndex];
-// }
-//
-// @Override
-// public boolean advance() {
-//   if (cells == null) return false;
-//   cellScannerIndex++;
-//   if (cellScannerIndex < this.cells.length) {
-//     return true;
-//   } else if (cellScannerIndex == this.cells.length) {
-//     return false;
-//   }
-//   throw new NoSuchElementException("Cannot advance beyond the last cell");
-// }
-
  public Boolean getExists() {
    return exists;
  }
@@ -910,16 +505,6 @@ public class ResultImpl implements Result {
    return stale;
  }
 
-// /**
-//  * @deprecated the word 'partial' ambiguous, use {@link #mayHaveMoreCellsInRow()} instead.
-//  *             Deprecated since 1.4.0.
-//  * @see #mayHaveMoreCellsInRow()
-//  */
-// @Deprecated
-// public boolean isPartial() {
-//   return mayHaveMoreCellsInRow;
-// }
-
  /**
   * For scanning large rows, the RS may choose to return the cells chunk by chunk to prevent OOM
   * or timeout. This flag is used to tell you if the current Result is the last one of the current
@@ -932,23 +517,6 @@ public class ResultImpl implements Result {
    return mayHaveMoreCellsInRow;
  }
 
-// /**
-//  * Set load information about the region to the information about the result
-//  * @param loadStats statistics about the current region from which this was returned
-//  */
-// @InterfaceAudience.Private
-// public void setStatistics(RegionLoadStats loadStats) {
-//   this.stats = loadStats;
-// }
-//
-// /**
-//  * @return the associated statistics about the region from which this was returned. Can be
-//  * <tt>null</tt> if stats are disabled.
-//  */
-// public RegionLoadStats getStats() {
-//   return stats;
-// }
-
  /**
   * All methods modifying state of Result object must call this method
   * to ensure that special purpose immutable Results can't be accidentally modified.
@@ -958,38 +526,4 @@ public class ResultImpl implements Result {
      throw new UnsupportedOperationException("Attempting to modify readonly EMPTY_RESULT!");
    }
  }
-
-// /**
-//  * Return true if this Result is a cursor to tell users where the server has scanned.
-//  * In this Result the only meaningful method is {@link #getCursor()}.
-//  *
-//  * {@code
-//  *  while (r = scanner.next() && r != null) {
-//  *    if(r.isCursor()){
-//  *    // scanning is not end, it is a cursor, save its row key and close scanner if you want, or
-//  *    // just continue the loop to call next().
-//  *    } else {
-//  *    // just like before
-//  *    }
-//  *  }
-//  *  // scanning is end
-//  *
-//  * }
-//  * {@link Scan#setNeedCursorResult(boolean)}
-//  * {@link Cursor}
-//  * {@link #getCursor()}
-//  */
-// public boolean isCursor() {
-//   return cursor != null ;
-// }
-//
-// /**
-//  * Return the cursor if this Result is a cursor result.
-//  * {@link Scan#setNeedCursorResult(boolean)}
-//  * {@link Cursor}
-//  * {@link #isCursor()}
-//  */
-// public Cursor getCursor(){
-//   return cursor;
-// }
 }
