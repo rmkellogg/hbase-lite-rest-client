@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 
 import org.apache.hadoop.hbase.client.lite.Scan;
-import org.apache.hadoop.hbase.client.lite.impl.ByteStringer;
 import org.apache.hadoop.hbase.client.lite.impl.Bytes;
 import org.apache.hadoop.hbase.client.lite.impl.HConstants;
 import org.apache.hadoop.hbase.client.lite.impl.ProtobufMessageHandler;
@@ -193,13 +192,13 @@ public class ScannerModel implements ProtobufMessageHandler {
  public byte[] createProtobufOutput() {
    Scanner.Builder builder = Scanner.newBuilder();
    if (!Bytes.equals(startRow, HConstants.EMPTY_START_ROW)) {
-     builder.setStartRow(ByteStringer.wrap(startRow));
+     builder.setStartRow(ByteString.copyFrom(startRow));
    }
    if (!Bytes.equals(endRow, HConstants.EMPTY_START_ROW)) {
-     builder.setEndRow(ByteStringer.wrap(endRow));
+     builder.setEndRow(ByteString.copyFrom(endRow));
    }
    for (byte[] column: columns) {
-     builder.addColumns(ByteStringer.wrap(column));
+     builder.addColumns(ByteString.copyFrom(column));
    }
    if (startTime != 0) {
      builder.setStartTime(startTime);

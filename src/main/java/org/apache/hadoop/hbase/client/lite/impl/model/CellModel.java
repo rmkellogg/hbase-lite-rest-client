@@ -25,12 +25,13 @@ import java.io.IOException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.hadoop.hbase.client.lite.impl.ByteStringer;
 import org.apache.hadoop.hbase.client.lite.impl.CellUtil;
 import org.apache.hadoop.hbase.client.lite.impl.HConstants;
 import org.apache.hadoop.hbase.client.lite.impl.ProtobufMessageHandler;
 import org.apache.hadoop.hbase.client.lite.impl.ProtobufUtil;
 import org.apache.hadoop.hbase.rest.protobuf.generated.CellMessage.Cell;
+
+import com.google.protobuf.ByteString;
 
 /**
 * Representation of a cell. A cell is a single value associated a column and
@@ -156,8 +157,8 @@ public class CellModel implements ProtobufMessageHandler {
  @Override
  public byte[] createProtobufOutput() {
    Cell.Builder builder = Cell.newBuilder();
-   builder.setColumn(ByteStringer.wrap(getColumn()));
-   builder.setData(ByteStringer.wrap(getValue()));
+   builder.setColumn(ByteString.copyFrom(getColumn()));
+   builder.setData(ByteString.copyFrom(getValue()));
    if (hasUserTimestamp()) {
      builder.setTimestamp(getTimestamp());
    }

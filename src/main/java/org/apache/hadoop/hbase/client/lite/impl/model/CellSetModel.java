@@ -24,12 +24,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.hadoop.hbase.client.lite.impl.ByteStringer;
 import org.apache.hadoop.hbase.client.lite.impl.HConstants;
 import org.apache.hadoop.hbase.client.lite.impl.ProtobufMessageHandler;
 import org.apache.hadoop.hbase.client.lite.impl.ProtobufUtil;
 import org.apache.hadoop.hbase.rest.protobuf.generated.CellMessage.Cell;
 import org.apache.hadoop.hbase.rest.protobuf.generated.CellSetMessage.CellSet;
+
+import com.google.protobuf.ByteString;
 
 /**
 * Representation of a grouping of cells. May contain cells from more than
@@ -73,11 +74,11 @@ public class CellSetModel implements ProtobufMessageHandler {
    CellSet.Builder builder = CellSet.newBuilder();
    for (RowModel row: getRows()) {
      CellSet.Row.Builder rowBuilder = CellSet.Row.newBuilder();
-     rowBuilder.setKey(ByteStringer.wrap(row.getKey()));
+     rowBuilder.setKey(ByteString.copyFrom(row.getKey()));
      for (CellModel cell: row.getCells()) {
        Cell.Builder cellBuilder = Cell.newBuilder();
-       cellBuilder.setColumn(ByteStringer.wrap(cell.getColumn()));
-       cellBuilder.setData(ByteStringer.wrap(cell.getValue()));
+       cellBuilder.setColumn(ByteString.copyFrom(cell.getColumn()));
+       cellBuilder.setData(ByteString.copyFrom(cell.getValue()));
        if (cell.hasUserTimestamp()) {
          cellBuilder.setTimestamp(cell.getTimestamp());
        }
