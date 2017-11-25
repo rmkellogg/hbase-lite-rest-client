@@ -12,14 +12,7 @@ import org.apache.hadoop.hbase.client.lite.Cell;
  * format should be taken into consideration, for which the instance of this comparator
  * should be used.  In all other cases the static APIs in this comparator would be enough
  */
-//@edu.umd.cs.findbugs.annotations.SuppressWarnings(
-//    value="UNKNOWN",
-//    justification="Findbugs doesn't like the way we are negating the result of a compare in below")
-//@InterfaceAudience.Private
-//@InterfaceStability.Evolving
 public class CellComparatorImpl implements CellComparator {
-//  static final Log LOG = LogFactory.getLog(CellComparatorImpl.class);
-  
   /**
    * Comparator for plain key/values; i.e. non-catalog table key/values. Works on Key portion
    * of KeyValue only.
@@ -55,7 +48,7 @@ public class CellComparatorImpl implements CellComparator {
     if (!ignoreSequenceid) {
       // Negate following comparisons so later edits show up first
       // mvccVersion: later sorts first
-      return Longs.compare(b.getSequenceId(), a.getSequenceId());
+      return compare(b.getSequenceId(), a.getSequenceId());
     } else {
       return c;
     }
@@ -83,27 +76,6 @@ public class CellComparatorImpl implements CellComparator {
    */
   @Override
   public final int compareFamilies(Cell left, Cell right) {
-//    if (left instanceof ByteBufferCell && right instanceof ByteBufferCell) {
-//      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getFamilyByteBuffer(),
-//          ((ByteBufferCell) left).getFamilyPosition(), left.getFamilyLength(),
-//          ((ByteBufferCell) right).getFamilyByteBuffer(),
-//          ((ByteBufferCell) right).getFamilyPosition(), right.getFamilyLength());
-//    }
-//    if (left instanceof ByteBufferCell) {
-//      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getFamilyByteBuffer(),
-//          ((ByteBufferCell) left).getFamilyPosition(), left.getFamilyLength(),
-//          right.getFamilyArray(), right.getFamilyOffset(), right.getFamilyLength());
-//    }
-//    if (right instanceof ByteBufferCell) {
-//      // Notice how we flip the order of the compare here. We used to negate the return value but
-//      // see what FindBugs says
-//      // http://findbugs.sourceforge.net/bugDescriptions.html#RV_NEGATING_RESULT_OF_COMPARETO
-//      // It suggest flipping the order to get same effect and 'safer'.
-//      return ByteBufferUtils.compareTo(
-//          left.getFamilyArray(), left.getFamilyOffset(), left.getFamilyLength(),
-//          ((ByteBufferCell)right).getFamilyByteBuffer(),
-//          ((ByteBufferCell)right).getFamilyPosition(), right.getFamilyLength());
-//    }
     return Bytes.compareTo(left.getFamilyArray(), left.getFamilyOffset(), left.getFamilyLength(),
         right.getFamilyArray(), right.getFamilyOffset(), right.getFamilyLength());
   }
@@ -116,29 +88,6 @@ public class CellComparatorImpl implements CellComparator {
    */
   @Override
   public final int compareQualifiers(Cell left, Cell right) {
-//    if (left instanceof ByteBufferCell && right instanceof ByteBufferCell) {
-//      return ByteBufferUtils
-//          .compareTo(((ByteBufferCell) left).getQualifierByteBuffer(),
-//              ((ByteBufferCell) left).getQualifierPosition(),
-//              left.getQualifierLength(), ((ByteBufferCell) right).getQualifierByteBuffer(),
-//              ((ByteBufferCell) right).getQualifierPosition(),
-//              right.getQualifierLength());
-//    }
-//    if (left instanceof ByteBufferCell) {
-//      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getQualifierByteBuffer(),
-//          ((ByteBufferCell) left).getQualifierPosition(), left.getQualifierLength(),
-//          right.getQualifierArray(), right.getQualifierOffset(), right.getQualifierLength());
-//    }
-//    if (right instanceof ByteBufferCell) {
-//      // Notice how we flip the order of the compare here. We used to negate the return value but
-//      // see what FindBugs says
-//      // http://findbugs.sourceforge.net/bugDescriptions.html#RV_NEGATING_RESULT_OF_COMPARETO
-//      // It suggest flipping the order to get same effect and 'safer'.
-//      return ByteBufferUtils.compareTo(left.getQualifierArray(),
-//          left.getQualifierOffset(), left.getQualifierLength(),
-//          ((ByteBufferCell)right).getQualifierByteBuffer(),
-//          ((ByteBufferCell)right).getQualifierPosition(), right.getQualifierLength());
-//    }
     return Bytes.compareTo(left.getQualifierArray(), left.getQualifierOffset(),
         left.getQualifierLength(), right.getQualifierArray(), right.getQualifierOffset(),
         right.getQualifierLength());
@@ -158,26 +107,6 @@ public class CellComparatorImpl implements CellComparator {
     if (left == right) {
       return 0;
     }
-//    if (left instanceof ByteBufferCell && right instanceof ByteBufferCell) {
-//      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getRowByteBuffer(),
-//          ((ByteBufferCell) left).getRowPosition(), left.getRowLength(),
-//          ((ByteBufferCell) right).getRowByteBuffer(),
-//          ((ByteBufferCell) right).getRowPosition(), right.getRowLength());
-//    }
-//    if (left instanceof ByteBufferCell) {
-//      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getRowByteBuffer(),
-//          ((ByteBufferCell) left).getRowPosition(), left.getRowLength(),
-//          right.getRowArray(), right.getRowOffset(), right.getRowLength());
-//    }
-//    if (right instanceof ByteBufferCell) {
-//      // Notice how we flip the order of the compare here. We used to negate the return value but
-//      // see what FindBugs says
-//      // http://findbugs.sourceforge.net/bugDescriptions.html#RV_NEGATING_RESULT_OF_COMPARETO
-//      // It suggest flipping the order to get same effect and 'safer'.
-//      return ByteBufferUtils.compareTo(left.getRowArray(), left.getRowOffset(), left.getRowLength(),
-//          ((ByteBufferCell)right).getRowByteBuffer(),
-//          ((ByteBufferCell)right).getRowPosition(), right.getRowLength());
-//    }
     return Bytes.compareTo(left.getRowArray(), left.getRowOffset(), left.getRowLength(),
         right.getRowArray(), right.getRowOffset(), right.getRowLength());
   }
@@ -200,11 +129,6 @@ public class CellComparatorImpl implements CellComparator {
    */
   @Override
   public int compareRows(Cell left, byte[] right, int roffset, int rlength) {
-//    if (left instanceof ByteBufferCell) {
-//      return ByteBufferUtils.compareTo(((ByteBufferCell) left).getRowByteBuffer(),
-//          ((ByteBufferCell) left).getRowPosition(), left.getRowLength(), right,
-//          roffset, rlength);
-//    }
     return Bytes.compareTo(left.getRowArray(), left.getRowOffset(), left.getRowLength(), right,
         roffset, rlength);
   }
@@ -221,15 +145,6 @@ public class CellComparatorImpl implements CellComparator {
     int rFamLength = right.getFamilyLength();
     int lQualLength = left.getQualifierLength();
     int rQualLength = right.getQualifierLength();
-//    if (lFamLength + lQualLength == 0
-//          && left.getTypeByte() == Type.Minimum.getCode()) {
-//      // left is "bigger", i.e. it appears later in the sorted order
-//      return 1;
-//    }
-//    if (rFamLength + rQualLength == 0
-//        && right.getTypeByte() == Type.Minimum.getCode()) {
-//      return -1;
-//    }
     if (lFamLength != rFamLength) {
       // comparing column family is enough.
       return compareFamilies(left, right);
