@@ -42,8 +42,6 @@ public class TimeRange {
   /**
    * Default constructor.
    * Represents interval [0, Long.MAX_VALUE) (allTime)
-   * @deprecated This is made @InterfaceAudience.Private in the 2.0 line and above and may be
-   * changed to private or removed in 3.0.
    */
   public TimeRange() {
     this(INITIAL_MIN_TIMESTAMP, INITIAL_MAX_TIMESTAMP);

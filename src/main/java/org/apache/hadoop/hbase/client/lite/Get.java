@@ -53,8 +53,6 @@ import org.apache.hadoop.hbase.client.lite.impl.HConstants;
 * <p>
 * To limit the number of versions of each column to be returned, execute
 * {@link #setMaxVersions(int) setMaxVersions}.
-* <p>
-* To add a filter, call {@link #setFilter(Filter) setFilter}.
 */
 public class Get {
  private byte [] row = null;
@@ -148,7 +146,6 @@ public class Get {
   * Method for retrieving the get's row
   * @return row
   */
-// @Override
  public byte [] getRow() {
    return this.row;
  }
@@ -207,7 +204,6 @@ public class Get {
   * logging, and administration tools.
   * @return Map
   */
-// @Override
  public Map<String, Object> getFingerprint() {
    Map<String, Object> map = new HashMap<>();
    List<String> families = new ArrayList<>(this.familyMap.entrySet().size());
@@ -226,7 +222,6 @@ public class Get {
   * @param maxCols a limit on the number of columns output prior to truncation
   * @return Map
   */
-// @Override
  public Map<String, Object> toMap(int maxCols) {
    // we start with the fingerprint map and build on top of it.
    Map<String, Object> map = getFingerprint();

@@ -192,15 +192,9 @@ public abstract class Mutation {
    * Method for retrieving the delete's row
    * @return row
    */
-//  @Override
   public byte [] getRow() {
     return this.row;
   }
-
-//  @Override
-//  public int compareTo(final Row d) {
-//    return Bytes.compareTo(this.getRow(), d.getRow());
-//  }
 
   /**
    * Method for retrieving the timestamp
@@ -235,7 +229,6 @@ public abstract class Mutation {
    * &gt; {@link HConstants#MAX_ROW_LENGTH}
    * @return <code>row</code>
    */
-//  static byte [] checkRow(final byte [] row) {
   public static byte [] checkRow(final byte [] row) {
     return checkRow(row, 0, row == null? 0: row.length);
   }
@@ -248,7 +241,6 @@ public abstract class Mutation {
    * &gt; {@link HConstants#MAX_ROW_LENGTH}
    * @return <code>row</code>
    */
-//  static byte [] checkRow(final byte [] row, final int offset, final int length) {
   public static byte [] checkRow(final byte [] row, final int offset, final int length) {
     if (row == null) {
       throw new IllegalArgumentException("Row buffer is null");

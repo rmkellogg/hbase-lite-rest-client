@@ -113,7 +113,6 @@ public class Put extends Mutation {
    List<Cell> list = getCellList(family);
    //Checking that the row of the kv is the same as the put
    if (!CellUtil.matchingRows(kv, this.row)) {
-//     throw new WrongRowIOException("The row in " + kv.toString() +
      throw new IOException("The row in " + kv.toString() +
        " doesn't match the original one " +  Bytes.toStringBinary(this.row));
    }

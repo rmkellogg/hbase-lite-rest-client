@@ -59,8 +59,6 @@ import org.apache.hadoop.hbase.client.lite.impl.KeyValue;
 * deleteFamily -- then you need to use the method overrides that take a
 * timestamp.  The constructor timestamp is not referenced.
 */
-//@InterfaceAudience.Public
-//public class Delete extends Mutation implements Comparable<Row> {
 public class Delete extends Mutation {
  /**
   * Create a Delete operation for the specified row.
@@ -128,55 +126,6 @@ public class Delete extends Mutation {
    this.row = Bytes.copy(row, rowOffset, rowLength);
    setTimestamp(timestamp);
  }
-
-// /**
-//  * @param d Delete to clone.
-//  */
-// public Delete(final Delete d) {
-//   this.row = d.getRow();
-//   this.ts = d.getTimeStamp();
-//   this.familyMap.putAll(d.getFamilyCellMap());
-//   this.durability = d.durability;
-//   for (Map.Entry<String, byte[]> entry : d.getAttributesMap().entrySet()) {
-//     this.setAttribute(entry.getKey(), entry.getValue());
-//   }
-//   super.setPriority(d.getPriority());
-// }
-//
-// /**
-//  * Advanced use only. Add an existing delete marker to this Delete object.
-//  * @param kv An existing KeyValue of type "delete".
-//  * @return this for invocation chaining
-//  * @throws IOException
-//  * @deprecated As of release 2.0.0, this will be removed in HBase 3.0.0. Use {@link #add(Cell)}
-//  *             instead
-//  */
-// @SuppressWarnings("unchecked")
-// @Deprecated
-// public Delete addDeleteMarker(Cell kv) throws IOException {
-//   return this.add(kv);
-// }
-//
-// /**
-//  * Add an existing delete marker to this Delete object.
-//  * @param kv An existing KeyValue of type "delete".
-//  * @return this for invocation chaining
-//  * @throws IOException
-//  */
-// public Delete add(Cell kv) throws IOException {
-//   if (!CellUtil.isDelete(kv)) {
-//     throw new IOException("The recently added KeyValue is not of type "
-//         + "delete. Rowkey: " + Bytes.toStringBinary(this.row));
-//   }
-//   if (!CellUtil.matchingRows(kv, this.row)) {
-//     throw new WrongRowIOException("The row in " + kv.toString() +
-//       " doesn't match the original one " +  Bytes.toStringBinary(this.row));
-//   }
-//   byte [] family = CellUtil.cloneFamily(kv);
-//   List<Cell> list = getCellList(family);
-//   list.add(kv);
-//   return this;
-// }
 
  /**
   * Delete all versions of all columns of the specified family.
@@ -309,54 +258,4 @@ public class Delete extends Mutation {
    map.put("ts", this.ts);
    return map;
  }
-
-// @Override
-// public Delete setAttribute(String name, byte[] value) {
-//   return (Delete) super.setAttribute(name, value);
-// }
-//
-// @Override
-// public Delete setId(String id) {
-//   return (Delete) super.setId(id);
-// }
-//
-// @Override
-// public Delete setDurability(Durability d) {
-//   return (Delete) super.setDurability(d);
-// }
-//
-// @Override
-// public Delete setFamilyCellMap(NavigableMap<byte[], List<Cell>> map) {
-//   return (Delete) super.setFamilyCellMap(map);
-// }
-//
-// @Override
-// public Delete setClusterIds(List<UUID> clusterIds) {
-//   return (Delete) super.setClusterIds(clusterIds);
-// }
-//
-// @Override
-// public Delete setCellVisibility(CellVisibility expression) {
-//   return (Delete) super.setCellVisibility(expression);
-// }
-//
-// @Override
-// public Delete setACL(String user, Permission perms) {
-//   return (Delete) super.setACL(user, perms);
-// }
-//
-// @Override
-// public Delete setACL(Map<String, Permission> perms) {
-//   return (Delete) super.setACL(perms);
-// }
-//
-// @Override
-// public Delete setTTL(long ttl) {
-//   throw new UnsupportedOperationException("Setting TTLs on Deletes is not supported");
-// }
-//
-// @Override
-// public Delete setPriority(int priority) {
-//   return (Delete) super.setPriority(priority);
-// }
 }
