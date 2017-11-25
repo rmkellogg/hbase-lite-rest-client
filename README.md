@@ -15,6 +15,8 @@ Improvments:
    * Access to underlying Apache HttpClient for unique client needs
    * Reduced footprint by stripping away rarely used or methods not supported by the HBase REST Server.
    * RemoteHTable and RemoteAdmin are now interfaces.
+   * Convenience methods on Result using Strings, i.e. getIntValue, getStringValue, containsColumn, etc.
+   
 
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
   
@@ -35,6 +37,12 @@ Get get = new Get("KEYA".getBytes());
 		
 Result result = table.get(get);
 dumpResult(result);
+
+// Use Strings directly without conversion to byte arrays
+if (result.containsColumn("Family","ColA")) 
+{
+   System.out.println(result.getIntValue("Family","ColA",0));
+}
 
 Scan scan = new Scan("KEYA".getBytes(), "KEYB".getBytes());
     	
