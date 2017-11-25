@@ -59,127 +59,6 @@ public class RemoteHTableImpl implements RemoteHTable {
  private final int maxRetries;
  private final long sleepTime;
 
- @SuppressWarnings("rawtypes")
- protected String buildRowSpec(final byte[] row, final Map familyMap,
-     final long startTime, final long endTime, final int maxVersions) {
-   StringBuffer sb = new StringBuffer();
-   sb.append('/');
-   sb.append(name);
-   sb.append('/');
-   sb.append(toURLEncodedBytes(row));
-   Set families = familyMap.entrySet();
-   if (families != null) {
-     Iterator i = familyMap.entrySet().iterator();
-     sb.append('/');
-     while (i.hasNext()) {
-       Map.Entry e = (Map.Entry)i.next();
-       Collection quals = (Collection)e.getValue();
-       if (quals == null || quals.isEmpty()) {
-         // this is an unqualified family. append the family name and NO ':'
-         sb.append(toURLEncodedBytes((byte[])e.getKey()));
-       } else {
-         Iterator ii = quals.iterator();
-         while (ii.hasNext()) {
-           sb.append(toURLEncodedBytes((byte[])e.getKey()));
-           sb.append(':');
-           Object o = ii.next();
-           // Puts use byte[] but Deletes use KeyValue
-           if (o instanceof byte[]) {
-             sb.append(toURLEncodedBytes((byte[])o));
-           } else if (o instanceof KeyValue) {
-             sb.append(toURLEncodedBytes(CellUtil.cloneQualifier((KeyValue)o)));
-           } else {
-             throw new RuntimeException("object type not handled");
-           }
-           if (ii.hasNext()) {
-             sb.append(',');
-           }
-         }
-       }
-       if (i.hasNext()) {
-         sb.append(',');
-       }
-     }
-   }
-   if (startTime >= 0 && endTime != Long.MAX_VALUE) {
-     sb.append('/');
-     sb.append(startTime);
-     if (startTime != endTime) {
-       sb.append(',');
-       sb.append(endTime);
-     }
-   } else if (endTime != Long.MAX_VALUE) {
-     sb.append('/');
-     sb.append(endTime);
-   }
-   if (maxVersions > 1) {
-     sb.append("?v=");
-     sb.append(maxVersions);
-   }
-   return sb.toString();
- }
-
- protected String buildMultiRowSpec(final byte[][] rows, int maxVersions) {
-   StringBuilder sb = new StringBuilder();
-   sb.append('/');
-//   sb.append(Bytes.toString(name));
-   sb.append(name);
-   sb.append("/multiget/");
-   if (rows == null || rows.length == 0) {
-     return sb.toString();
-   }
-   sb.append("?");
-   for(int i=0; i<rows.length; i++) {
-     byte[] rk = rows[i];
-     if (i != 0) {
-       sb.append('&');
-     }
-     sb.append("row=");
-     sb.append(toURLEncodedBytes(rk));
-   }
-   sb.append("&v=");
-   sb.append(maxVersions);
-
-   return sb.toString();
- }
-
- protected ResultImpl[] buildResultFromModel(final CellSetModel model) {
-   List<ResultImpl> results = new ArrayList<>();
-   for (RowModel row: model.getRows()) {
-     List<Cell> kvs = new ArrayList<>(row.getCells().size());
-     for (CellModel cell: row.getCells()) {
-       byte[][] split = CellUtil.parseColumn(cell.getColumn());
-       byte[] column = split[0];
-       byte[] qualifier = null;
-       if (split.length == 1) {
-         qualifier = HConstants.EMPTY_BYTE_ARRAY;
-       } else if (split.length == 2) {
-         qualifier = split[1];
-       } else {
-         throw new IllegalArgumentException("Invalid familyAndQualifier provided.");
-       }
-       kvs.add(new KeyValue(row.getKey(), column, qualifier,
-         cell.getTimestamp(), cell.getValue()));
-     }
-     results.add(ResultImpl.create(kvs));
-   }
-   return results.toArray(new ResultImpl[results.size()]);
- }
-
- protected CellSetModel buildModelFromPut(Put put) {
-   RowModel row = new RowModel(put.getRow());
-   long ts = put.getTimeStamp();
-   for (List<Cell> cells: put.getFamilyCellMap().values()) {
-     for (Cell cell: cells) {
-       row.addCell(new CellModel(CellUtil.cloneFamily(cell), CellUtil.cloneQualifier(cell),
-         ts != HConstants.LATEST_TIMESTAMP ? ts : cell.getTimestamp(),
-         CellUtil.cloneValue(cell)));
-     }
-   }
-   CellSetModel model = new CellSetModel();
-   model.addRow(row);
-   return model;
- }
  /**
   * Constructor
   */
@@ -232,11 +111,8 @@ public class RemoteHTableImpl implements RemoteHTable {
  @Override
  public Result get(Get get) throws IOException {
    TimeRange range = get.getTimeRange();
-   String spec = buildRowSpec(get.getRow(), get.getFamilyMap(),
-     range.getMin(), range.getMax(), get.getMaxVersions());
-//   if (get.getFilter() != null) {
-//     LOG.warn("filters not supported on gets");
-//   }
+   String spec = buildRowSpec(get.getRow(), get.getFamilyMap(), range.getMin(), range.getMax(), get.getMaxVersions());
+
    ResultImpl[] results = getResults(spec);
    if (results.length > 0) {
      if (results.length > 1) {
@@ -269,36 +145,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    String spec = buildMultiRowSpec(rows, maxVersions);
 
    return getResults(spec);
- }
-
- private ResultImpl[] getResults(String spec) throws IOException {
-   for (int i = 0; i < maxRetries; i++) {
-     Response response = client.get(spec, Constants.MIMETYPE_PROTOBUF);
-     int code = response.getCode();
-     switch (code) {
-       case 200:
-         CellSetModel model = new CellSetModel();
-         model.getObjectFromMessage(response.getBody());
-         ResultImpl[] results = buildResultFromModel(model);
-         if ( results.length > 0) {
-           return results;
-         }
-         // fall through
-       case 404:
-         return new ResultImpl[0];
-
-       case 509:
-         try {
-           Thread.sleep(sleepTime);
-         } catch (InterruptedException e) {
-           throw (InterruptedIOException)new InterruptedIOException().initCause(e);
-         }
-         break;
-       default:
-         throw new IOException("get request returned " + code);
-     }
-   }
-   throw new IOException("get request timed out");
  }
 
  @Override
@@ -434,139 +280,6 @@ public class RemoteHTableImpl implements RemoteHTable {
    }
  }
 
- class Scanner implements ResultScanner {
-
-   String uri;
-
-   public Scanner(Scan scan) throws IOException {
-     ScannerModel model;
-     try {
-       model = ScannerModel.fromScan(scan);
-     } catch (Exception e) {
-       throw new IOException(e);
-     }
-     StringBuffer sb = new StringBuffer();
-     sb.append('/');
-     sb.append(name);
-     sb.append('/');
-     sb.append("scanner");
-     for (int i = 0; i < maxRetries; i++) {
-       Response response = client.post(sb.toString(),
-         Constants.MIMETYPE_PROTOBUF, model.createProtobufOutput());
-       int code = response.getCode();
-       switch (code) {
-       case 201:
-         uri = response.getLocation();
-         return;
-       case 509:
-         try {
-           Thread.sleep(sleepTime);
-         } catch (InterruptedException e) {
-           throw (InterruptedIOException)new InterruptedIOException().initCause(e);
-         }
-         break;
-       default:
-         throw new IOException("scan request failed with " + code);
-       }
-     }
-     throw new IOException("scan request timed out");
-   }
-
-   @Override
-   public Result[] next(int nbRows) throws IOException {
-     StringBuilder sb = new StringBuilder(uri);
-     sb.append("?n=");
-     sb.append(nbRows);
-     for (int i = 0; i < maxRetries; i++) {
-       Response response = client.get(sb.toString(),
-         Constants.MIMETYPE_PROTOBUF);
-       int code = response.getCode();
-       switch (code) {
-       case 200:
-         CellSetModel model = new CellSetModel();
-         model.getObjectFromMessage(response.getBody());
-         return buildResultFromModel(model);
-       case 204:
-       case 206:
-         return null;
-       case 509:
-         try {
-           Thread.sleep(sleepTime);
-         } catch (InterruptedException e) {
-           throw (InterruptedIOException)new InterruptedIOException().initCause(e);
-         }
-         break;
-       default:
-         throw new IOException("scanner.next request failed with " + code);
-       }
-     }
-     throw new IOException("scanner.next request timed out");
-   }
-
-   @Override
-   public Result next() throws IOException {
-     Result[] results = next(1);
-     if (results == null || results.length < 1) {
-       return null;
-     }
-     return results[0];
-   }
-
-   class Iter implements Iterator<Result> {
-
-     Result cache;
-
-     public Iter() {
-       try {
-         cache = Scanner.this.next();
-       } catch (IOException e) {
-//         LOG.warn(eStringUtils.stringifyException(e));
-         LOG.warn(e.getMessage(),e);
-       }
-     }
-
-     @Override
-     public boolean hasNext() {
-       return cache != null;
-     }
-
-     @Override
-     public Result next() {
-       Result result = cache;
-       try {
-         cache = Scanner.this.next();
-       } catch (IOException e) {
-//         LOG.warn(StringUtils.stringifyException(e));
-           LOG.warn(e.getMessage(),e);
-         cache = null;
-       }
-       return result;
-     }
-
-     @Override
-     public void remove() {
-       throw new RuntimeException("remove() not supported");
-     }
-
-   }
-
-   @Override
-   public Iterator<Result> iterator() {
-     return new Iter();
-   }
-
-   @Override
-   public void close() {
-     try {
-       client.delete(uri);
-     } catch (IOException e) {
-//       LOG.warn(StringUtils.stringifyException(e));
-         LOG.warn(e.getMessage(),e);
-     }
-   }
- }
-
-
  @Override
  public ResultScanner getScanner(Scan scan) throws IOException {
    return new Scanner(scan);
@@ -660,6 +373,288 @@ public class RemoteHTableImpl implements RemoteHTable {
      }
    }
    throw new IOException("checkAndDelete request timed out");
+ }
+
+ class Scanner implements ResultScanner {
+   String uri;
+
+   public Scanner(Scan scan) throws IOException {
+     ScannerModel model;
+     try {
+       model = ScannerModel.fromScan(scan);
+     } catch (Exception e) {
+       throw new IOException(e);
+     }
+     StringBuffer sb = new StringBuffer();
+     sb.append('/');
+     sb.append(name);
+     sb.append('/');
+     sb.append("scanner");
+     for (int i = 0; i < maxRetries; i++) {
+       Response response = client.post(sb.toString(),
+         Constants.MIMETYPE_PROTOBUF, model.createProtobufOutput());
+       int code = response.getCode();
+       switch (code) {
+       case 201:
+         uri = response.getLocation();
+         return;
+       case 509:
+         try {
+           Thread.sleep(sleepTime);
+         } catch (InterruptedException e) {
+           throw (InterruptedIOException)new InterruptedIOException().initCause(e);
+         }
+         break;
+       default:
+         throw new IOException("scan request failed with " + code);
+       }
+     }
+     throw new IOException("scan request timed out");
+   }
+
+   @Override
+   public Result[] next(int nbRows) throws IOException {
+     StringBuilder sb = new StringBuilder(uri);
+     sb.append("?n=");
+     sb.append(nbRows);
+     for (int i = 0; i < maxRetries; i++) {
+       Response response = client.get(sb.toString(),
+         Constants.MIMETYPE_PROTOBUF);
+       int code = response.getCode();
+       switch (code) {
+       case 200:
+         CellSetModel model = new CellSetModel();
+         model.getObjectFromMessage(response.getBody());
+         return buildResultFromModel(model);
+       case 204:
+       case 206:
+         return null;
+       case 509:
+         try {
+           Thread.sleep(sleepTime);
+         } catch (InterruptedException e) {
+           throw (InterruptedIOException)new InterruptedIOException().initCause(e);
+         }
+         break;
+       default:
+         throw new IOException("scanner.next request failed with " + code);
+       }
+     }
+     throw new IOException("scanner.next request timed out");
+   }
+
+   @Override
+   public Result next() throws IOException {
+     Result[] results = next(1);
+     if (results == null || results.length < 1) {
+       return null;
+     }
+     return results[0];
+   }
+
+   class Iter implements Iterator<Result> {
+
+     Result cache;
+
+     public Iter() {
+       try {
+         cache = Scanner.this.next();
+       } catch (IOException e) {
+//	         LOG.warn(eStringUtils.stringifyException(e));
+         LOG.warn(e.getMessage(),e);
+       }
+     }
+
+     @Override
+     public boolean hasNext() {
+       return cache != null;
+     }
+
+     @Override
+     public Result next() {
+       Result result = cache;
+       try {
+         cache = Scanner.this.next();
+       } catch (IOException e) {
+//	         LOG.warn(StringUtils.stringifyException(e));
+           LOG.warn(e.getMessage(),e);
+         cache = null;
+       }
+       return result;
+     }
+
+     @Override
+     public void remove() {
+       throw new RuntimeException("remove() not supported");
+     }
+
+   }
+
+   @Override
+   public Iterator<Result> iterator() {
+     return new Iter();
+   }
+
+   @Override
+   public void close() {
+     try {
+       client.delete(uri);
+     } catch (IOException e) {
+//	       LOG.warn(StringUtils.stringifyException(e));
+         LOG.warn(e.getMessage(),e);
+     }
+   }
+ }
+
+ private ResultImpl[] getResults(String spec) throws IOException {
+   for (int i = 0; i < maxRetries; i++) {
+     Response response = client.get(spec, Constants.MIMETYPE_PROTOBUF);
+     int code = response.getCode();
+     switch (code) {
+       case 200:
+         CellSetModel model = new CellSetModel();
+         model.getObjectFromMessage(response.getBody());
+         ResultImpl[] results = buildResultFromModel(model);
+         if ( results.length > 0) {
+           return results;
+         }
+         // fall through
+       case 404:
+         return new ResultImpl[0];
+
+       case 509:
+         try {
+           Thread.sleep(sleepTime);
+         } catch (InterruptedException e) {
+           throw (InterruptedIOException)new InterruptedIOException().initCause(e);
+         }
+         break;
+       default:
+         throw new IOException("get request returned " + code);
+     }
+   }
+   throw new IOException("get request timed out");
+ }
+
+ @SuppressWarnings("rawtypes")
+ private String buildRowSpec(final byte[] row, final Map familyMap,
+     final long startTime, final long endTime, final int maxVersions) {
+   StringBuffer sb = new StringBuffer();
+   sb.append('/');
+   sb.append(name);
+   sb.append('/');
+   sb.append(toURLEncodedBytes(row));
+   Set families = familyMap.entrySet();
+   if (families != null) {
+     Iterator i = familyMap.entrySet().iterator();
+     sb.append('/');
+     while (i.hasNext()) {
+       Map.Entry e = (Map.Entry)i.next();
+       Collection quals = (Collection)e.getValue();
+       if (quals == null || quals.isEmpty()) {
+         // this is an unqualified family. append the family name and NO ':'
+         sb.append(toURLEncodedBytes((byte[])e.getKey()));
+       } else {
+         Iterator ii = quals.iterator();
+         while (ii.hasNext()) {
+           sb.append(toURLEncodedBytes((byte[])e.getKey()));
+           sb.append(':');
+           Object o = ii.next();
+           // Puts use byte[] but Deletes use KeyValue
+           if (o instanceof byte[]) {
+             sb.append(toURLEncodedBytes((byte[])o));
+           } else if (o instanceof KeyValue) {
+             sb.append(toURLEncodedBytes(CellUtil.cloneQualifier((KeyValue)o)));
+           } else {
+             throw new RuntimeException("object type not handled");
+           }
+           if (ii.hasNext()) {
+             sb.append(',');
+           }
+         }
+       }
+       if (i.hasNext()) {
+         sb.append(',');
+       }
+     }
+   }
+   if (startTime >= 0 && endTime != Long.MAX_VALUE) {
+     sb.append('/');
+     sb.append(startTime);
+     if (startTime != endTime) {
+       sb.append(',');
+       sb.append(endTime);
+     }
+   } else if (endTime != Long.MAX_VALUE) {
+     sb.append('/');
+     sb.append(endTime);
+   }
+   if (maxVersions > 1) {
+     sb.append("?v=");
+     sb.append(maxVersions);
+   }
+   return sb.toString();
+ }
+
+ private String buildMultiRowSpec(final byte[][] rows, int maxVersions) {
+   StringBuilder sb = new StringBuilder();
+   sb.append('/');
+   sb.append(name);
+   sb.append("/multiget/");
+   if (rows == null || rows.length == 0) {
+     return sb.toString();
+   }
+   sb.append("?");
+   for(int i=0; i<rows.length; i++) {
+     byte[] rk = rows[i];
+     if (i != 0) {
+       sb.append('&');
+     }
+     sb.append("row=");
+     sb.append(toURLEncodedBytes(rk));
+   }
+   sb.append("&v=");
+   sb.append(maxVersions);
+
+   return sb.toString();
+ }
+
+ private ResultImpl[] buildResultFromModel(final CellSetModel model) {
+   List<ResultImpl> results = new ArrayList<>();
+   for (RowModel row: model.getRows()) {
+     List<Cell> kvs = new ArrayList<>(row.getCells().size());
+     for (CellModel cell: row.getCells()) {
+       byte[][] split = CellUtil.parseColumn(cell.getColumn());
+       byte[] column = split[0];
+       byte[] qualifier = null;
+       if (split.length == 1) {
+         qualifier = HConstants.EMPTY_BYTE_ARRAY;
+       } else if (split.length == 2) {
+         qualifier = split[1];
+       } else {
+         throw new IllegalArgumentException("Invalid familyAndQualifier provided.");
+       }
+       kvs.add(new KeyValue(row.getKey(), column, qualifier,
+         cell.getTimestamp(), cell.getValue()));
+     }
+     results.add(ResultImpl.create(kvs));
+   }
+   return results.toArray(new ResultImpl[results.size()]);
+ }
+
+ private CellSetModel buildModelFromPut(Put put) {
+   RowModel row = new RowModel(put.getRow());
+   long ts = put.getTimeStamp();
+   for (List<Cell> cells: put.getFamilyCellMap().values()) {
+     for (Cell cell: cells) {
+       row.addCell(new CellModel(CellUtil.cloneFamily(cell), CellUtil.cloneQualifier(cell),
+         ts != HConstants.LATEST_TIMESTAMP ? ts : cell.getTimestamp(),
+         CellUtil.cloneValue(cell)));
+     }
+   }
+   CellSetModel model = new CellSetModel();
+   model.addRow(row);
+   return model;
  }
 
  /*

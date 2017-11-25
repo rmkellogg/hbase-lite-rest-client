@@ -31,10 +31,10 @@ import org.apache.hadoop.hbase.client.lite.impl.model.VersionModel;
 
 public class RemoteAdminImpl implements RemoteAdmin {
 
- final Client client;
- final String accessToken;
- final int maxRetries;
- final long sleepTime;
+ private final Client client;
+ private final String accessToken;
+ private final int maxRetries;
+ private final long sleepTime;
 
  /**
   * Constructor
