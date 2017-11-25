@@ -18,6 +18,7 @@
 */
 package org.apache.hadoop.hbase.client.lite.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -83,8 +84,6 @@ public class ResultImpl implements Result {
  public static final ResultImpl EMPTY_RESULT = new ResultImpl(true);
 
  private final boolean readonly;
-
-// private Cursor cursor = null;
 
  /**
   * Creates an empty Result w/ no KeyValue payload; returns null if you call {@link #rawCells()}.
@@ -165,6 +164,7 @@ public class ResultImpl implements Result {
   * the row from which this Result was created.
   * @return row
   */
+ @Override
  public byte [] getRow() {
    if (this.row == null) {
      this.row = (this.cells == null || this.cells.length == 0) ?
@@ -305,14 +305,13 @@ public class ResultImpl implements Result {
  }
 
  /**
-  * Get the latest version of the specified column.
-  * Note: this call clones the value content of the hosting Cell. See
-  * {@link #getValueAsByteBuffer(byte[], byte[])}, etc., or {@link #listCells()} if you would
-  * avoid the cloning.
+  * Get the latest version of the specified column as a byte array.
+  * Note: this call clones the value content of the hosting Cell. 
   * @param family family name
   * @param qualifier column qualifier
   * @return value of latest version of column, null if none found
   */
+ @Override
  public byte[] getValue(byte [] family, byte [] qualifier) {
    Cell kv = getColumnLatestCell(family, qualifier);
    if (kv == null) {
@@ -320,6 +319,190 @@ public class ResultImpl implements Result {
    }
    return CellUtil.cloneValue(kv);
  }
+
+	 /**
+	  * Get the latest version of the specified column as a String (UTF-8).
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public String getStringValue(String family, String qualifier, String defaultValue)
+	{
+		String value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+		
+		if (data != null)
+		{
+			value = new String(data,HConstants.DEF_CHARSET);
+		}
+	
+		return value;
+	}
+	
+	 /**
+	  * Get the latest version of the specified column as a float.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public float getFloatValue(String family, String qualifier, float defaultValue)
+	{
+		float value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+			
+		if (data != null)
+		{
+			value = Bytes.toFloat(data);
+		}
+		
+		return value;
+	}
+	
+	 /**
+	  * Get the latest version of the specified column as a double.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public double getDoubleValue(String family, String qualifier, double defaultValue)
+	{
+		double value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+		
+		if (data != null)
+		{
+			value = Bytes.toDouble(data);
+		}
+
+		return value;
+	}
+
+	 /**
+	  * Get the latest version of the specified column as a BigDecimal.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public BigDecimal getBigDecimal(String family, String qualifier, BigDecimal defaultValue)
+	{
+		BigDecimal value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+		
+		if (data != null)
+		{
+			value = Bytes.toBigDecimal(data);
+		}
+
+		return value;
+	}
+
+	 /**
+	  * Get the latest version of the specified column as a byte.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public byte getByteValue(String family, String qualifier, byte defaultValue)
+	{
+		byte value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+			
+		if (data != null)
+		{
+			value = data[0];
+		}
+
+		return value;
+	}
+
+	 /**
+	  * Get the latest version of the specified column as a int.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public int getIntegerValue(String family, String qualifier, int defaultValue)
+	{
+		int value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+			
+		if (data != null)
+		{
+			value = Bytes.toInt(data);
+		}
+
+		return value;
+	}
+
+	 /**
+	  * Get the latest version of the specified column as a short.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public short getShortValue(String family, String qualifier, short defaultValue)
+	{
+		short value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+			
+		if (data != null)
+		{
+			value = Bytes.toShort(data);
+		}
+
+		return value;
+	}
+
+	 /**
+	  * Get the latest version of the specified column as a double.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public long getDoubleValue(String family, String qualifier, long defaultValue)
+	{
+		long value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+		
+		if (data != null)
+		{
+			value = Bytes.toLong(data);
+		}
+		
+		return value;
+	}
 
  /**
   * Checks for existence of a value for the specified column (empty or not).
@@ -329,10 +512,25 @@ public class ResultImpl implements Result {
   *
   * @return true if at least one value exists in the result, false if not
   */
- public boolean containsColumn(byte [] family, byte [] qualifier) {
+@Override
+public boolean containsColumn(byte [] family, byte [] qualifier) {
    Cell kv = getColumnLatestCell(family, qualifier);
    return kv != null;
  }
+
+/**
+ * Checks for existence of a value for the specified column (empty or not).
+ *
+ * @param family family name
+ * @param qualifier column qualifier
+ *
+ * @return true if at least one value exists in the result, false if not
+ */
+@Override
+public boolean containsColumn(String family, String qualifier) {
+  Cell kv = getColumnLatestCell(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+  return kv != null;
+}
 
  /**
   * Map of families to all versions of its qualifiers and values.
@@ -343,6 +541,7 @@ public class ResultImpl implements Result {
   * Note: All other map returning methods make use of this map internally.
   * @return map from families to qualifiers to versions
   */
+ @Override
  public NavigableMap<byte[], NavigableMap<byte[], NavigableMap<Long, byte[]>>> getMap() {
    if (this.familyMap != null) {
      return this.familyMap;
@@ -385,7 +584,8 @@ public class ResultImpl implements Result {
   * The most recent version of each qualifier will be used.
   * @return map from families to qualifiers and value
   */
- public NavigableMap<byte[], NavigableMap<byte[], byte[]>> getNoVersionMap() {
+@Override
+public NavigableMap<byte[], NavigableMap<byte[], byte[]>> getNoVersionMap() {
    if(this.familyMap == null) {
      getMap();
    }
@@ -414,6 +614,7 @@ public class ResultImpl implements Result {
   * @param family column family to get
   * @return map of qualifiers to values
   */
+ @Override
  public NavigableMap<byte[], byte[]> getFamilyMap(byte [] family) {
    if(this.familyMap == null) {
      getMap();
@@ -451,6 +652,7 @@ public class ResultImpl implements Result {
   * Check if the underlying Cell [] is empty or not
   * @return true if empty
   */
+ @Override
  public boolean isEmpty() {
    return this.cells == null || this.cells.length == 0;
  }
@@ -458,6 +660,7 @@ public class ResultImpl implements Result {
  /**
   * @return the size of the underlying Cell []
   */
+ @Override
  public int size() {
    return this.cells == null? 0: this.cells.length;
  }

@@ -18,8 +18,15 @@
 */
 package org.apache.hadoop.hbase.client.lite.impl;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 public class HConstants {
-	  
+	 /**
+	  * Default character set used for column families, qualifiers, etc.
+	  */
+	 public static final Charset DEF_CHARSET = StandardCharsets.UTF_8;
+
 	  /** delimiter used between portions of a region name */
 	  public static final int DELIMITER = ',';
 	  
