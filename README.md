@@ -24,17 +24,17 @@ RemoteHTable Example:
 
 ```
 HttpClient httpClient = HttpClientBuilder.create().build();
- 			
+            
 RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
-	 						.addHost("hostname:8080")
- 							.withProtocol("http")
- 							.withMaxRetries(10)
-							.withSleepTime(1000)
-							.withHttpClient(httpClient)
-							.build();
+                            .addHost("hostname:8080")
+                            .withProtocol("http")
+                            .withMaxRetries(10)
+                            .withSleepTime(1000)
+                            .withHttpClient(httpClient)
+                            .build();
 
 Get get = new Get("KEYA".getBytes());
-		
+        
 Result result = table.get(get);
 dumpResult(result);
 
@@ -45,57 +45,57 @@ if (result.containsColumn("Family","ColA"))
 }
 
 Scan scan = new Scan("KEYA".getBytes(), "KEYB".getBytes());
-    	
+        
 ResultScanner scanner = table.getScanner(scan);
-    	
+        
 for(Result row : scanner)
 {
-	dumpResult(row);
+    dumpResult(row);
 }
 
 ...
-	private static void dumpResult(Result result)
-	{
-		System.out.println(result.isEmpty());
+private static void dumpResult(Result result)
+{
+    System.out.println(result.isEmpty());
 
-    	NavigableMap<byte[], NavigableMap<byte[], byte[]>> noVersionMap = result.getNoVersionMap();
-    	
-    	if (noVersionMap.isEmpty())
-		{
-    		System.out.println("No Map items");
-		}
-    	else
-    	{
-    		NavigableMap<byte[], byte[]> keyAndValues = noVersionMap.get("CF".getBytes());
-    		
-    		if (keyAndValues != null)
-    		{
-    			for(byte[] key : keyAndValues.keySet())
-    			{
-    				String keyString = new String(key);
-    				byte[] value = keyAndValues.get(key);
-    				String valueString = new String(value);
-    				
-    				System.out.println(keyString + "/" + valueString);
-    			}
-    		}
-    	}
-	}
+    NavigableMap<byte[], NavigableMap<byte[], byte[]>> noVersionMap = result.getNoVersionMap();
+    
+    if (noVersionMap.isEmpty())
+    {
+        System.out.println("No Map items");
+    }
+    else
+    {
+        NavigableMap<byte[], byte[]> keyAndValues = noVersionMap.get("CF".getBytes());
+        
+        if (keyAndValues != null)
+        {
+            for(byte[] key : keyAndValues.keySet())
+            {
+                String keyString = new String(key);
+                byte[] value = keyAndValues.get(key);
+                String valueString = new String(value);
+                
+                System.out.println(keyString + "/" + valueString);
+            }
+        }
+    }
+}
 ```
 
 RemoteAdmin Example:
 
 ```
  HttpClient httpClient = HttpClientBuilder.create().build();
- 			
+            
  RemoteAdminBuilder admin = RemoteAdminBuilder.create("namespace:tablename")
- 						.addHost("hostname:8080")
- 						.withProtocol("https")
- 						.withMaxRetries(10)
- 						.withSleepTime(1000)
- 						.withHttpClient(httpClient)
- 						.build();
+                        .addHost("hostname:8080")
+                        .withProtocol("https")
+                        .withMaxRetries(10)
+                        .withSleepTime(1000)
+                        .withHttpClient(httpClient)
+                        .build();
 
  System.out.println(admin.getRestVersion());
- System.out.println(admin.getTableList()); 						
+ System.out.println(admin.getTableList());                      
 ```
