@@ -67,11 +67,36 @@ public class Get {
   * all columns in all families of the specified row.
   * @param row row key
   */
+ public Get(String row) {
+   byte[] data = row.getBytes(HConstants.DEF_CHARSET); 
+   Mutation.checkRow(data);
+   this.row = data;
+ }
+ 
+ /**
+  * Create a Get operation for the specified row.
+  * <p>
+  * If no further operations are done, this will get the latest version of
+  * all columns in all families of the specified row.
+  * @param row row key
+  */
  public Get(byte [] row) {
    Mutation.checkRow(row);
    this.row = row;
  }
 
+
+ /**
+  * Get all columns from the specified family.
+  * <p>
+  * Overrides previous calls to addColumn for this family.
+  * @param family family name
+  * @return the Get object
+  */
+ public Get addFamily(String family) {
+	 return addFamily(family.getBytes(HConstants.DEF_CHARSET));
+ }
+ 
  /**
   * Get all columns from the specified family.
   * <p>
@@ -85,6 +110,18 @@ public class Get {
    return this;
  }
 
+ /**
+  * Get the column from the specific family with the specified qualifier.
+  * <p>
+  * Overrides previous calls to addFamily for this family.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @return the Get objec
+  */
+ public Get addColumn(String family, String qualifier) {
+	 return addColumn(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+ }
+ 
  /**
   * Get the column from the specific family with the specified qualifier.
   * <p>
