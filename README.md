@@ -34,8 +34,8 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .build();
 
 Get get = new Get("KEYA".getBytes(StandardCharsets.UTF_8));
-get.addFamily("Family");
-get.addColumn("Family","ColB");
+get.addFamily("Family".getBytes(StandardCharsets.UTF_8));
+get.addColumn("Family".getBytes(StandardCharsets.UTF_8),"ColB".getBytes(StandardCharsets.UTF_8));
 
 // or use Strings directly without conversion to byte arrays explicitly
 //Get get = new Get("KEYA");
