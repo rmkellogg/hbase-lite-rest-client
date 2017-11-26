@@ -19,8 +19,8 @@ Improvements:
    
 
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
-  
-RemoteHTable Example:
+
+RemoteHTable Construction:
 
 ```
 HttpClient httpClient = HttpClientBuilder.create().build();
@@ -32,24 +32,17 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .withSleepTime(1000)
                             .withHttpClient(httpClient)
                             .build();
+```
+  
+Legacy RemoteHTable examples using byte arrays:
 
+```
 Get get = new Get("KEYA".getBytes(StandardCharsets.UTF_8));
 get.addFamily("Family".getBytes(StandardCharsets.UTF_8));
 get.addColumn("Family".getBytes(StandardCharsets.UTF_8),"ColB".getBytes(StandardCharsets.UTF_8));
-
-// or use Strings directly without conversion to byte arrays explicitly
-//Get get = new Get("KEYA");
-//get.addFamily("Family");
-//get.addColumn("Family","ColB");
-        
+  
 Result result = table.get(get);
 dumpResult(result);
-
-// Use Strings directly without conversion to byte arrays explicitly
-if (result.containsColumn("Family","ColA")) 
-{
-   System.out.println(result.getIntValue("Family","ColA",0));
-}
 
 Scan scan = new Scan("KEYA".getBytes(StandardCharsets.UTF_8), "KEYB".getBytes(StandardCharsets.UTF_8));
         
@@ -63,13 +56,33 @@ for(Result row : scanner)
 Put put = new Put("KEYA".getBytes(StandardCharsets.UTF_8));
 put.addColumn("COLA".getBytes(StandardCharsets.UTF_8), "VALUE1".getBytes(StandardCharsets.UTF_8));
 table.put(put);
-
-// or use other data types directly without conversion to byte arrays explicitly
-//Put put = new Put("KEYA");
-//put.addColumn("COLA", "VALUE1");
-//put.addColumn("COLB", 37);
-//table.put(put);
 ...
+
+
+Modern API RemoteHTable examples using native data types:
+
+```
+Get get = new Get("KEYA");
+get.addFamily("Family");
+get.addColumn("Family","ColB");
+        
+Result result = table.get(get);
+dumpResult(result);
+
+// Use Strings directly without conversion to byte arrays explicitly
+if (result.containsColumn("Family","ColA")) 
+{
+   System.out.println(result.getIntValue("Family","ColA",0));
+}
+
+Put put = new Put("KEYA");
+put.addColumn("COLA", "VALUE1");
+put.addColumn("COLB", 37);
+table.put(put);
+```
+
+Helper Methods:
+```
 private static void dumpResult(Result result)
 {
     System.out.println(result.isEmpty());
