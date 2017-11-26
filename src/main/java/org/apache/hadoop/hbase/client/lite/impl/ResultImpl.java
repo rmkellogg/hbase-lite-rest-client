@@ -338,7 +338,30 @@ public class ResultImpl implements Result {
 	
 		return value;
 	}
-	
+
+	 /**
+	  * Get the latest version of the specified column as a float.
+	  * Note: this call clones the value content of the hosting Cell. 
+	  * @param family family name
+	  * @param qualifier column qualifier
+	  * @param defaultValue Value returned if value does not exist.
+	  * @return value of latest version of column, defaultValue if none found
+	  */
+	@Override
+	public boolean getBooleanValue(String family, String qualifier, boolean defaultValue)
+	{
+		boolean value = defaultValue;
+		
+		byte[] data = getValue(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET));
+			
+		if (data != null)
+		{
+			value = Bytes.toBoolean(data);
+		}
+		
+		return value;
+	}
+
 	 /**
 	  * Get the latest version of the specified column as a float.
 	  * Note: this call clones the value content of the hosting Cell. 

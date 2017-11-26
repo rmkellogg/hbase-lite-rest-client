@@ -19,6 +19,7 @@
 package org.apache.hadoop.hbase.client.lite;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +46,14 @@ public class Put extends Mutation {
  }
 
  /**
+  * Create a Put operation for the specified row.
+  * @param row row key
+  */
+ public Put(String row) {
+   this(row.getBytes(HConstants.DEF_CHARSET), HConstants.LATEST_TIMESTAMP);
+ }
+
+ /**
   * Create a Put operation for the specified row, using a given timestamp.
   *
   * @param row row key; we make a copy of what we are passed to keep local.
@@ -54,6 +63,16 @@ public class Put extends Mutation {
    this(row, 0, row.length, ts);
  }
 
+ /**
+  * Create a Put operation for the specified row, using a given timestamp.
+  *
+  * @param row row key; we make a copy of what we are passed to keep local.
+  * @param ts timestamp
+  */
+ public Put(String row, long ts) {
+   this(row.getBytes(HConstants.DEF_CHARSET), ts);
+ }
+ 
  /**
   * We make a copy of the passed in row key to keep local.
   * @param rowArray
@@ -68,6 +87,116 @@ public class Put extends Mutation {
    if (ts < 0) {
      throw new IllegalArgumentException("Timestamp cannot be negative. ts=" + ts);
    }
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, byte [] value) {
+   return addColumn(family.getBytes(HConstants.DEF_CHARSET), qualifier.getBytes(HConstants.DEF_CHARSET), value);
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, String value) {
+   return addColumn(family, qualifier, value.getBytes(HConstants.DEF_CHARSET));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, boolean value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, long value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, int value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, short value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, byte value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, float value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, double value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
+ }
+
+ /**
+  * Add the specified column and value to this Put operation.
+  * @param family family name
+  * @param qualifier column qualifier
+  * @param value column value
+  * @return this
+  */
+ public Put addColumn(String family, String qualifier, BigDecimal value) {
+   return addColumn(family, qualifier, Bytes.toBytes(value));
  }
 
  /**

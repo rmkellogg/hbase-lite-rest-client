@@ -29,7 +29,17 @@ public interface Result {
 	   * @return value of latest version of column, defaultValue if none found
 	   */
 	  String getStringValue(String family, String qualifier, String defaultValue);
-	    
+
+	  /**
+	   * Get the latest version of the specified column as a boolean.
+	   * Note: this call clones the value content of the hosting Cell. 
+	   * @param family family name
+	   * @param qualifier column qualifier
+	   * @param defaultValue Value returned if value does not exist.
+	   * @return value of latest version of column, defaultValue if none found
+	   */
+	  boolean getBooleanValue(String family, String qualifier, boolean defaultValue);
+
 	  /**
 	   * Get the latest version of the specified column as a float.
 	   * Note: this call clones the value content of the hosting Cell. 

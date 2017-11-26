@@ -9,14 +9,13 @@ By comparison the HBase REST Client included with HBase 2.x even after careful e
  
 Care has been taken to allow for use against existing clients of the RemoteHTable interface by replacement of the package name alone.  
 
-Improvments:
+Improvements:
 
    * Fluent API for construction of RemoteHTable and RemoteAdmin.
    * Access to underlying Apache HttpClient for unique client needs
    * Reduced footprint by stripping away rarely used or methods not supported by the HBase REST Server.
    * RemoteHTable and RemoteAdmin are now interfaces.
-   * Convenience methods on Result using Strings, i.e. getIntValue, getStringValue, containsColumn, etc.
-   * Convenience methods on Get using Strings, constructor, addColumn, addFamily, etc.
+   * API improvements using Strings and other primitives in addition to byte arrays on: Result, Get, Put
    
 
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
@@ -34,22 +33,25 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .withHttpClient(httpClient)
                             .build();
 
-Get get = new Get("KEYA".getBytes());
-// Use Strings directly without conversion to byte arrays
-//Get get2 = new Get("KEYA");
-//get2.addFamily("Family");
-//get2.addColumn("Family","ColB");
+Get get = new Get("KEYA".getBytes(StandardCharsets.UTF_8));
+get.addFamily("Family");
+get.addColumn("Family","ColB");
+
+// or use Strings directly without conversion to byte arrays explicitly
+//Get get = new Get("KEYA");
+//get.addFamily("Family");
+//get.addColumn("Family","ColB");
         
 Result result = table.get(get);
 dumpResult(result);
 
-// Use Strings directly without conversion to byte arrays
+// Use Strings directly without conversion to byte arrays explicitly
 if (result.containsColumn("Family","ColA")) 
 {
    System.out.println(result.getIntValue("Family","ColA",0));
 }
 
-Scan scan = new Scan("KEYA".getBytes(), "KEYB".getBytes());
+Scan scan = new Scan("KEYA".getBytes(StandardCharsets.UTF_8), "KEYB".getBytes(StandardCharsets.UTF_8));
         
 ResultScanner scanner = table.getScanner(scan);
         
@@ -58,6 +60,15 @@ for(Result row : scanner)
     dumpResult(row);
 }
 
+Put put = new Put("KEYA".getBytes(StandardCharsets.UTF_8));
+put.addColumn("COLA".getBytes(StandardCharsets.UTF_8), "VALUE1".getBytes(StandardCharsets.UTF_8));
+table.put(put);
+
+// or use other data types directly without conversion to byte arrays explicitly
+//Put put = new Put("KEYA");
+//put.addColumn("COLA", "VALUE1");
+//put.addColumn("COLB", 37);
+//table.put(put);
 ...
 private static void dumpResult(Result result)
 {
