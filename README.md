@@ -16,6 +16,7 @@ Improvments:
    * Reduced footprint by stripping away rarely used or methods not supported by the HBase REST Server.
    * RemoteHTable and RemoteAdmin are now interfaces.
    * Convenience methods on Result using Strings, i.e. getIntValue, getStringValue, containsColumn, etc.
+   * Convenience methods on Get using Strings, constructor, addColumn, addFamily, etc.
    
 
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
@@ -34,6 +35,10 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .build();
 
 Get get = new Get("KEYA".getBytes());
+// Use Strings directly without conversion to byte arrays
+//Get get2 = new Get("KEYA");
+//get2.addFamily("Family");
+//get2.addColumn("Family","ColB");
         
 Result result = table.get(get);
 dumpResult(result);

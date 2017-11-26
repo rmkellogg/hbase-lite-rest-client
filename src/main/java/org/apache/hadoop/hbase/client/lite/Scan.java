@@ -89,7 +89,6 @@ public class Scan {
   * @param startRow row to start scanner at or after
   * @deprecated use {@code new Scan().withStartRow(startRow)} instead.
   */
- @Deprecated
  public Scan(byte[] startRow) {
    setStartRow(startRow);
  }
@@ -100,7 +99,6 @@ public class Scan {
   * @param stopRow row to stop scanner before (exclusive)
   * @deprecated use {@code new Scan().withStartRow(startRow).withStopRow(stopRow)} instead.
   */
-// @Deprecated
  public Scan(byte[] startRow, byte[] stopRow) {
    setStartRow(startRow);
    setStopRow(stopRow);
@@ -528,7 +526,6 @@ public class Scan {
   * logging, and administration tools.
   * @return Map
   */
-// @Override
  public Map<String, Object> getFingerprint() {
    Map<String, Object> map = new HashMap<>();
    List<String> families = new ArrayList<>();
@@ -552,7 +549,6 @@ public class Scan {
   * @param maxCols a limit on the number of columns output prior to truncation
   * @return Map
   */
-// @Override
  public Map<String, Object> toMap(int maxCols) {
    // start with the fingerpring map and build on top of it
    Map<String, Object> map = getFingerprint();
