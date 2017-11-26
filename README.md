@@ -56,8 +56,7 @@ for(Result row : scanner)
 Put put = new Put("KEYA".getBytes(StandardCharsets.UTF_8));
 put.addColumn("COLA".getBytes(StandardCharsets.UTF_8), "VALUE1".getBytes(StandardCharsets.UTF_8));
 table.put(put);
-...
-
+```
 
 Modern API RemoteHTable examples using native data types:
 
@@ -82,6 +81,7 @@ table.put(put);
 ```
 
 Helper Methods:
+
 ```
 private static void dumpResult(Result result)
 {
