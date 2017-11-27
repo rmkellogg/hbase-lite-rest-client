@@ -188,7 +188,7 @@ public class Scan {
   * @deprecated use {@link #withStartRow(byte[])} instead. This method may change the inclusive of
   *             the stop row to keep compatible with the old behavior.
   */
- protected Scan setStartRow(byte[] startRow) {
+ public Scan setStartRow(byte[] startRow) {
    withStartRow(startRow);
    if (ClientUtil.areScanStartRowAndStopRowEqual(this.startRow, this.stopRow)) {
      // for keeping the old behavior that a scan with the same start and stop row is a get scan.
@@ -247,7 +247,7 @@ public class Scan {
   * @deprecated use {@link #withStartRow(byte[])} instead. This method may change the inclusive of
   *             the stop row to keep compatible with the old behavior.
   */
- protected Scan setStopRow(byte[] stopRow) {
+ public Scan setStopRow(byte[] stopRow) {
    withStopRow(stopRow);
    if (ClientUtil.areScanStartRowAndStopRowEqual(this.startRow, this.stopRow)) {
      // for keeping the old behavior that a scan with the same start and stop row is a get scan.
