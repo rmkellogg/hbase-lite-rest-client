@@ -42,6 +42,14 @@ public class PrivateCellUtil {
 	      left.getQualifierLength(), buf, offset, length);
 	  }
 
+	  public static boolean matchingColumn(final Cell left, final byte[] fam, final int foffset,
+		      final int flength, final byte[] qual, final int qoffset, final int qlength) {
+	    if (!matchingFamily(left, fam, foffset, flength)) {
+	      return false;
+	    }
+	    return matchingQualifier(left, qual, qoffset, qlength);
+	  }
+	  
 	  /**
 	   * These cells are used in reseeks/seeks to improve the read performance. They are not real cells
 	   * that are returned back to the clients

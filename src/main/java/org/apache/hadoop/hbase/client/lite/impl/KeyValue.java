@@ -828,75 +828,76 @@ public class KeyValue implements Cell {
 //    }
 //  }
 //
-//  /**
-//   * Write KeyValue format into the provided byte array.
-//   *
-//   * @param buffer the bytes buffer to use
-//   * @param boffset buffer offset
-//   * @param row row key
-//   * @param roffset row offset
-//   * @param rlength row length
-//   * @param family family name
-//   * @param foffset family offset
-//   * @param flength family length
-//   * @param qualifier column qualifier
-//   * @param qoffset qualifier offset
-//   * @param qlength qualifier length
-//   * @param timestamp version timestamp
-//   * @param type key type
-//   * @param value column value
-//   * @param voffset value offset
-//   * @param vlength value length
-//   *
-//   * @return The number of useful bytes in the buffer.
-//   *
-//   * @throws IllegalArgumentException an illegal value was passed or there is insufficient space
-//   * remaining in the buffer
-//   */
-//  public static int writeByteArray(byte [] buffer, final int boffset,
-//      final byte [] row, final int roffset, final int rlength,
-//      final byte [] family, final int foffset, int flength,
-//      final byte [] qualifier, final int qoffset, int qlength,
-//      final long timestamp, final Type type,
-//      final byte [] value, final int voffset, int vlength, Tag[] tags) {
-//
+  /**
+   * Write KeyValue format into the provided byte array.
+   *
+   * @param buffer the bytes buffer to use
+   * @param boffset buffer offset
+   * @param row row key
+   * @param roffset row offset
+   * @param rlength row length
+   * @param family family name
+   * @param foffset family offset
+   * @param flength family length
+   * @param qualifier column qualifier
+   * @param qoffset qualifier offset
+   * @param qlength qualifier length
+   * @param timestamp version timestamp
+   * @param type key type
+   * @param value column value
+   * @param voffset value offset
+   * @param vlength value length
+   *
+   * @return The number of useful bytes in the buffer.
+   *
+   * @throws IllegalArgumentException an illegal value was passed or there is insufficient space
+   * remaining in the buffer
+   */
+  public static int writeByteArray(byte [] buffer, final int boffset,
+      final byte [] row, final int roffset, final int rlength,
+      final byte [] family, final int foffset, int flength,
+      final byte [] qualifier, final int qoffset, int qlength,
+      final long timestamp, final Type type,
+      //final byte [] value, final int voffset, int vlength, Tag[] tags) {
+      final byte [] value, final int voffset, int vlength, Object[] tags) {
+
 //    checkParameters(row, rlength, family, flength, qlength, vlength);
-//
-//    // Calculate length of tags area
-//    int tagsLength = 0;
+
+    // Calculate length of tags area
+    int tagsLength = 0;
 //    if (tags != null && tags.length > 0) {
 //      for (Tag t: tags) {
 //        tagsLength += t.getValueLength() + Tag.INFRASTRUCTURE_SIZE;
 //      }
 //    }
 //    TagUtil.checkForTagsLength(tagsLength);
-//    int keyLength = (int) getKeyDataStructureSize(rlength, flength, qlength);
-//    int keyValueLength = (int) getKeyValueDataStructureSize(rlength, flength, qlength, vlength,
-//        tagsLength);
-//    if (keyValueLength > buffer.length - boffset) {
-//      throw new IllegalArgumentException("Buffer size " + (buffer.length - boffset) + " < " +
-//          keyValueLength);
-//    }
-//
-//    // Write key, value and key row length.
-//    int pos = boffset;
-//    pos = Bytes.putInt(buffer, pos, keyLength);
-//    pos = Bytes.putInt(buffer, pos, vlength);
-//    pos = Bytes.putShort(buffer, pos, (short)(rlength & 0x0000ffff));
-//    pos = Bytes.putBytes(buffer, pos, row, roffset, rlength);
-//    pos = Bytes.putByte(buffer, pos, (byte) (flength & 0x0000ff));
-//    if (flength != 0) {
-//      pos = Bytes.putBytes(buffer, pos, family, foffset, flength);
-//    }
-//    if (qlength != 0) {
-//      pos = Bytes.putBytes(buffer, pos, qualifier, qoffset, qlength);
-//    }
-//    pos = Bytes.putLong(buffer, pos, timestamp);
-//    pos = Bytes.putByte(buffer, pos, type.getCode());
-//    if (value != null && value.length > 0) {
-//      pos = Bytes.putBytes(buffer, pos, value, voffset, vlength);
-//    }
-//    // Write the number of tags. If it is 0 then it means there are no tags.
+    int keyLength = (int) getKeyDataStructureSize(rlength, flength, qlength);
+    int keyValueLength = (int) getKeyValueDataStructureSize(rlength, flength, qlength, vlength,
+        tagsLength);
+    if (keyValueLength > buffer.length - boffset) {
+      throw new IllegalArgumentException("Buffer size " + (buffer.length - boffset) + " < " +
+          keyValueLength);
+    }
+
+    // Write key, value and key row length.
+    int pos = boffset;
+    pos = Bytes.putInt(buffer, pos, keyLength);
+    pos = Bytes.putInt(buffer, pos, vlength);
+    pos = Bytes.putShort(buffer, pos, (short)(rlength & 0x0000ffff));
+    pos = Bytes.putBytes(buffer, pos, row, roffset, rlength);
+    pos = Bytes.putByte(buffer, pos, (byte) (flength & 0x0000ff));
+    if (flength != 0) {
+      pos = Bytes.putBytes(buffer, pos, family, foffset, flength);
+    }
+    if (qlength != 0) {
+      pos = Bytes.putBytes(buffer, pos, qualifier, qoffset, qlength);
+    }
+    pos = Bytes.putLong(buffer, pos, timestamp);
+    pos = Bytes.putByte(buffer, pos, type.getCode());
+    if (value != null && value.length > 0) {
+      pos = Bytes.putBytes(buffer, pos, value, voffset, vlength);
+    }
+    // Write the number of tags. If it is 0 then it means there are no tags.
 //    if (tagsLength > 0) {
 //      pos = Bytes.putAsShort(buffer, pos, tagsLength);
 //      for (Tag t : tags) {
@@ -907,8 +908,8 @@ public class KeyValue implements Cell {
 //        pos += tlen;
 //      }
 //    }
-//    return keyValueLength;
-//  }
+    return keyValueLength;
+  }
 //
 //  /**
 //   * Write KeyValue format into a byte array.

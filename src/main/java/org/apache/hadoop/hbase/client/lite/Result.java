@@ -111,6 +111,46 @@ public interface Result {
 	  long getDoubleValue(String family, String qualifier, long defaultValue);
 
 	  /**
+	   * Checks if the specified column contains a non-empty value (not a zero-length byte array).
+	   *
+	   * @param family family name
+	   * @param qualifier column qualifier
+	   *
+	   * @return whether or not a latest value exists and is not empty
+	   */
+	  boolean containsNonEmptyColumn(byte [] family, byte [] qualifier);
+
+	  /**
+	   * Checks if the specified column contains a non-empty value (not a zero-length byte array).
+	   *
+	   * @param family family name
+	   * @param qualifier column qualifier
+	   *
+	   * @return whether or not a latest value exists and is not empty
+	   */
+	  boolean containsNonEmptyColumn(String family, String qualifier);
+
+	  /**
+	   * Checks if the specified column contains an empty value (a zero-length byte array).
+	   *
+	   * @param family family name
+	   * @param qualifier column qualifier
+	   *
+	   * @return whether or not a latest value exists and is empty
+	   */
+	  boolean containsEmptyColumn(byte [] family, byte [] qualifier);
+
+	  /**
+	   * Checks if the specified column contains an empty value (a zero-length byte array).
+	   *
+	   * @param family family name
+	   * @param qualifier column qualifier
+	   *
+	   * @return whether or not a latest value exists and is empty
+	   */
+	  boolean containsEmptyColumn(String family, String qualifier);
+
+	  /**
 	   * Checks for existence of a value for the specified column (empty or not).
 	   *
 	   * @param family family name
