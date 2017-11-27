@@ -1,5 +1,6 @@
 package org.apache.hadoop.hbase.client.lite;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
@@ -8,7 +9,8 @@ import java.util.List;
  * 
  * Use RemoteTHableBuilder for construction
  */
-public interface RemoteHTable {
+public interface RemoteHTable extends AutoCloseable, Closeable
+{
 	  /**
 	   * Gets the fully qualified table name instance of this table.
 	   */
