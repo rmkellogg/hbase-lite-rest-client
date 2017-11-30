@@ -25,8 +25,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
+import java.security.PrivilegedExceptionAction;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.security.auth.Subject;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+import javax.security.auth.login.LoginContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,13 +68,28 @@ public class Client {
  private HttpResponse resp;
  private HttpGet httpGet = null;
  private String protocol;
+ /**
+  * Kerberos Keytab file location
+  */
+ private String keyTabLocation;
+ /**
+  * Kerberos User Principal
+  */
+ private String userPrincipal;
+ /**
+  * Execute Http Request using Kerberos context
+  */
+ private boolean useKerberos = false;
  
  private Map<String, String> extraHeaders = new ConcurrentHashMap<>();
 
- public Client(Cluster cluster, String protocol, HttpClient httpClient) {
+ public Client(Cluster cluster, String protocol, HttpClient httpClient, boolean useKerberos, String userPrincipal, String keyTabLocation) {
 	 this.cluster = cluster;
 	 this.protocol = protocol;
 	 this.httpClient = httpClient;
+	 this.useKerberos = useKerberos;
+	 this.userPrincipal = userPrincipal;
+	 this.keyTabLocation = keyTabLocation;
  }
  
  /**
@@ -155,7 +181,6 @@ public class Client {
   */
  public HttpResponse executeURI(HttpUriRequest method, Header[] headers, String uri)
      throws IOException {
-   // method.setURI(new URI(uri, true));
    for (Map.Entry<String, String> e: extraHeaders.entrySet()) {
      method.addHeader(e.getKey(), e.getValue());
    }
@@ -166,7 +191,30 @@ public class Client {
    }
    long startTime = System.currentTimeMillis();
    if (resp != null) EntityUtils.consumeQuietly(resp.getEntity());
-   resp = httpClient.execute(method);
+   
+   if (useKerberos) {
+	   // Execute HTTP Operation within Kerberos Security Context
+	   try {
+	     ClientLoginConfig loginConfig = new ClientLoginConfig(keyTabLocation, userPrincipal, null);
+		 Set<Principal> princ = new HashSet<Principal>(1);
+		 princ.add(new KerberosPrincipal(userPrincipal));
+		 Subject sub = new Subject(false, princ, new HashSet<Object>(), new HashSet<Object>());
+		 LoginContext lc = new LoginContext("", sub, null, loginConfig);
+		 lc.login();
+		 Subject serviceSubject = lc.getSubject();
+		 return Subject.doAs(serviceSubject, new PrivilegedExceptionAction<HttpResponse>() {
+				@Override
+				public HttpResponse run() throws IOException {
+					return httpClient.execute(method);
+				}
+			});
+	   }
+	   catch (Exception ex) {
+		   throw new IOException(ex.getMessage());
+	   }
+   } else {
+     resp = httpClient.execute(method);
+   }
 
    long endTime = System.currentTimeMillis();
    if (LOG.isTraceEnabled()) {
@@ -602,4 +650,48 @@ public class Client {
      method.releaseConnection();
    }
  }
+
+ /**
+  * Used for Kerberos configuration
+  */
+ private static class ClientLoginConfig extends Configuration {
+   private final String keyTabLocation;
+   private final String userPrincipal;
+   private final Map<String, Object> loginOptions;
+
+   public ClientLoginConfig(String keyTabLocation, String userPrincipal, Map<String, Object> loginOptions) {
+	   super();
+	   this.keyTabLocation = keyTabLocation;
+	   this.userPrincipal = userPrincipal;
+	   this.loginOptions = loginOptions;
+	}
+
+	@Override
+	public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
+		Map<String, Object> options = new HashMap<String, Object>();
+
+		// if we don't have keytab or principal only option is to rely on
+		// credentials cache.
+		if ((keyTabLocation == null) || userPrincipal == null) {
+			// cache
+			options.put("useTicketCache", "true");
+		} else {
+			// keytab
+			options.put("useKeyTab", "true");
+			options.put("keyTab", this.keyTabLocation);
+			options.put("principal", this.userPrincipal);
+			options.put("storeKey", "true");
+		}
+		options.put("doNotPrompt", "true");
+		options.put("isInitiator", "true");
+
+		if (loginOptions != null) {
+			options.putAll(loginOptions);
+		}
+
+		return new AppConfigurationEntry[] { new AppConfigurationEntry(
+				"com.sun.security.auth.module.Krb5LoginModule",
+				AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options) };
+	}
+  }
 }

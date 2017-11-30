@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hbase.client.lite;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.lite.impl.Client;
 import org.apache.hadoop.hbase.client.lite.impl.Cluster;
 import org.apache.hadoop.hbase.client.lite.impl.RemoteHTableImpl;
@@ -67,7 +68,7 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 			tempHttpClient = buildHttpClient();
 		}
 		
-		Client client = new Client(cluster, protocol, tempHttpClient);
+		Client client = new Client(cluster, protocol, tempHttpClient, useKerberos, userPrincipal, keyTabLocation);
 		
 		if (hosts.isEmpty())
 		{
@@ -96,11 +97,32 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 
 	public RemoteHTableBuilder withProtocol(final String protocol)
 	{
-		this.protocol = protocol;
+		this.protocol = StringUtils.trimToNull(protocol);
 		
 		return this;
 	}
 	
+	public RemoteHTableBuilder withUserPrincipal(String userPrincipal)
+	{
+		this.userPrincipal = StringUtils.trimToNull(userPrincipal);
+		
+		return this;
+	}
+	
+	public RemoteHTableBuilder withKeyTabLocation(String keyTabLocation)
+	{
+		this.keyTabLocation = StringUtils.trimToNull(keyTabLocation);
+		
+		return this;
+	}
+
+	public RemoteHTableBuilder withUserKerberos(boolean useKerberos)
+	{
+		this.useKerberos = useKerberos;
+		
+		return this;
+	}
+
 	public RemoteHTableBuilder withHttpClient(HttpClient httpClient)
 	{
 		this.httpClient = httpClient;

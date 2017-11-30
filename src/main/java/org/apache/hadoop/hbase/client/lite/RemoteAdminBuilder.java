@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hbase.client.lite;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.lite.impl.Client;
 import org.apache.hadoop.hbase.client.lite.impl.Cluster;
 import org.apache.hadoop.hbase.client.lite.impl.RemoteAdminImpl;
@@ -62,7 +63,7 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 			tempHttpClient = buildHttpClient();
 		}
 		
-		Client client = new Client(cluster, protocol, tempHttpClient);
+		Client client = new Client(cluster, protocol, tempHttpClient, useKerberos, userPrincipal, keyTabLocation);
 		
 		if (hosts.isEmpty())
 		{
@@ -91,7 +92,28 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 
 	public RemoteAdminBuilder withProtocol(final String protocol)
 	{
-		this.protocol = protocol;
+		this.protocol = StringUtils.trimToNull(protocol);
+		
+		return this;
+	}
+	
+	public RemoteAdminBuilder withUserPrincipal(String userPrincipal)
+	{
+		this.userPrincipal = StringUtils.trimToNull(userPrincipal);
+		
+		return this;
+	}
+	
+	public RemoteAdminBuilder withKeyTabLocation(String keyTabLocation)
+	{
+		this.keyTabLocation = StringUtils.trimToNull(keyTabLocation);
+		
+		return this;
+	}
+	
+	public RemoteAdminBuilder withUserKerberos(boolean useKerberos)
+	{
+		this.useKerberos = useKerberos;
 		
 		return this;
 	}
@@ -105,7 +127,7 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	
 	public RemoteAdminBuilder withAccessToken(String accessToken)
 	{
-		this.accessToken = accessToken;
+		this.accessToken = StringUtils.trimToNull(accessToken);
 		
 		return this;
 	}
