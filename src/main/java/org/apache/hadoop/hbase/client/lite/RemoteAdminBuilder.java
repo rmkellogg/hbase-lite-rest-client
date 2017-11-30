@@ -17,17 +17,10 @@
  */
 package org.apache.hadoop.hbase.client.lite;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.hadoop.hbase.client.lite.impl.Client;
 import org.apache.hadoop.hbase.client.lite.impl.Cluster;
 import org.apache.hadoop.hbase.client.lite.impl.RemoteAdminImpl;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 /**
  * Fluent API for construction of RemoteAdmin.
@@ -45,44 +38,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
  *							.build();
  * </pre>
  */
-public class RemoteAdminBuilder 
+public class RemoteAdminBuilder extends BaseHBaseBuilder
 {
-	public static final int DEFAULT_MAX_RETRIES = 10;
-	public static final long DEFAULT_SLEEP_TIME = 1000;
-	public static final int DEFAULT_CONNECTION_TIMEOUT = 1000;
-	
-	/**
-	 * Number of times to attempt request
-	 */
-	private int maxRetries = DEFAULT_MAX_RETRIES;
-	/**
-	 * Sleet time between requests on connection failure
-	 */
-	private long sleepTime = DEFAULT_SLEEP_TIME;
 	/**
 	 * Access token
 	 */
 	private String accessToken;
-	/**
-	 * Protocol used in creation of URL, i.e. http or https
-	 */
-	private String protocol = "http";
-	/**
-	 * Connection timeout in milliseconds
-	 */
-	private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT; 
-	/**
-	 * List of host names and port, i.e. hostname1:8080
-	 */
-	private List<String> hosts = new ArrayList<String>();
-	/**
-	 * Extra headers added to the request
-	 */
-	private Map<String, String> extraHeaders = new TreeMap<String, String>();
-	/*
-	 * Apache HttpClient
-	 */
-	private HttpClient httpClient;
 	
 	public static RemoteAdminBuilder create()
 	{
@@ -98,15 +59,7 @@ public class RemoteAdminBuilder
 		
 		if (tempHttpClient == null)
 		{
-			// Establish timeout configuration
-			RequestConfig config = RequestConfig.custom()
-					.setConnectTimeout(connectionTimeout)
-					.setConnectionRequestTimeout(connectionTimeout)
-					.setSocketTimeout(connectionTimeout).build();
-			
-			tempHttpClient = HttpClientBuilder.create()
-									.setDefaultRequestConfig(config)
-									.build();
+			tempHttpClient = buildHttpClient();
 		}
 		
 		Client client = new Client(cluster, protocol, tempHttpClient);
