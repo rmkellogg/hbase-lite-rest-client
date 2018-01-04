@@ -31,8 +31,16 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .withProtocol("http")
                             .withMaxRetries(10)
                             .withSleepTime(1000)
-                            .withAllowSelfSignedCertificates(false)
-                            .withHttpClient(httpClient) // Normally not required
+                            //.withAllowSelfSignedCertificates(false)
+                            
+                            // Set these for use of Kerberos
+								  //.withUseKerberos(true)
+								  //.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
+								  //.withUserPrincipal("hbase/hostname@REALM.COM")
+								     
+								  // With explicit HttpClient but normally not required                            
+                            //.withHttpClient(httpClient) 
+                            
                             .build();
 ```
   
@@ -124,8 +132,9 @@ RemoteAdmin Example:
                         .withProtocol("https")
                         .withMaxRetries(10)
                         .withSleepTime(1000)
-                        .withAllowSelfSignedCertificates(false)
-                        .withHttpClient(httpClient) // Normally not required
+                        //.withAllowSelfSignedCertificates(false)
+                        // With explicit HttpClient but normally not required
+                        //.withHttpClient(httpClient)
                         .build();
 
  System.out.println(admin.getRestVersion());

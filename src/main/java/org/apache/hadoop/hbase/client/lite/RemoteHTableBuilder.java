@@ -38,7 +38,15 @@ import org.apache.http.client.HttpClient;
  *							.withMaxRetries(10)
  *							.withSleepTime(1000)
  *                          .withAllowSelfSignedCertificates(false)
- *							.withHttpClient(httpClient) // Normally not required
+ *                          
+ *                          // Set these for use of Kerberos
+ *							//.withUseKerberos(true)
+ *							//.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
+ *  						//.withUserPrincipal("hbase/hostname@REALM.COM")
+ *  
+ *                          // With explicit HttpClient but normally not required                            
+ *                          //.withHttpClient(httpClient)
+ *                          
  *							.build();
  * </pre>
  */
@@ -99,6 +107,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return result;
 	}
 
+	/**
+	 * Protocol used in creation of URL, i.e. http or https
+	 */
 	public RemoteHTableBuilder withProtocol(final String protocol)
 	{
 		this.protocol = StringUtils.trimToNull(protocol);
@@ -106,6 +117,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Kerberos User Principal (ignored if useKerberos is not true)
+	 */
 	public RemoteHTableBuilder withUserPrincipal(String userPrincipal)
 	{
 		this.userPrincipal = StringUtils.trimToNull(userPrincipal);
@@ -113,6 +127,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Kerberos Keytab file location (ignored if useKerberos is not true)
+	 */
 	public RemoteHTableBuilder withKeyTabLocation(String keyTabLocation)
 	{
 		this.keyTabLocation = StringUtils.trimToNull(keyTabLocation);
@@ -120,6 +137,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 
+	/**
+	 * Use Kerberos context during Http Request
+	 */
 	public RemoteHTableBuilder withUseKerberos(boolean useKerberos)
 	{
 		this.useKerberos = useKerberos;
@@ -127,6 +147,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 
+	/**
+	 * Externally configured Apache HttpClient
+	 */
 	public RemoteHTableBuilder withHttpClient(HttpClient httpClient)
 	{
 		this.httpClient = httpClient;
@@ -134,6 +157,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Number of times to attempt request
+	 */
 	public RemoteHTableBuilder withMaxRetries(int maxRetries)
 	{
 		this.maxRetries = maxRetries;
@@ -141,13 +167,19 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Sleet time between requests on connection failure
+	 */
 	public RemoteHTableBuilder withSleepTime(int sleepTime)
 	{
 		this.sleepTime = sleepTime;
 		
 		return this;
 	}
-	
+
+	/**
+	 * Connection timeout in milliseconds
+	 */
 	public RemoteHTableBuilder withConnectionTimeout(int connectionTimeout)
 	{
 		this.connectionTimeout = connectionTimeout;
@@ -155,6 +187,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 
+	/**
+	 * Allow use of self-signed SSL certificates
+	 */
 	public RemoteHTableBuilder withAllowSelfSignedCertificates(boolean allowSelfSignedCertificates)
 	{
 		this.allowSelfSignedCerts = allowSelfSignedCertificates;
@@ -162,6 +197,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 
+	/**
+	 * Host name and port, i.e. hostname1:8080
+	 */	
 	public RemoteHTableBuilder addHost(final String hostName)
 	{
 		this.hosts.add(hostName);
@@ -169,6 +207,9 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Extra headers added to the request
+	 */
 	public RemoteHTableBuilder addExtraHeader(final String headerName, final String headerValue)
 	{
 		this.extraHeaders.put(headerName,  headerValue);

@@ -38,7 +38,15 @@ import org.apache.http.client.HttpClient;
  *							.withMaxRetries(10)
  *							.withSleepTime(1000)
  *                          .withAllowSelfSignedCertificates(false)
- *							.withHttpClient(httpClient) // Normally not required
+ *                          
+ *                          // Set these for use of Kerberos
+ *							//.withUseKerberos(true)
+ *							//.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
+ *  						//.withUserPrincipal("hbase/hostname@REALM.COM")
+ *  
+ *                          // With explicit HttpClient but normally not required                            
+ *                          //.withHttpClient(httpClient)
+ *                           
  *							.build();
  * </pre>
  */
@@ -94,6 +102,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return result;
 	}
 
+	/**
+	 * Protocol used in creation of URL, i.e. http or https
+	 */
 	public RemoteAdminBuilder withProtocol(final String protocol)
 	{
 		this.protocol = StringUtils.trimToNull(protocol);
@@ -101,6 +112,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Kerberos User Principal (ignored if useKerberos is not true)
+	 */
 	public RemoteAdminBuilder withUserPrincipal(String userPrincipal)
 	{
 		this.userPrincipal = StringUtils.trimToNull(userPrincipal);
@@ -108,6 +122,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Kerberos Keytab file location (ignored if useKerberos is not true)
+	 */	
 	public RemoteAdminBuilder withKeyTabLocation(String keyTabLocation)
 	{
 		this.keyTabLocation = StringUtils.trimToNull(keyTabLocation);
@@ -115,6 +132,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Use Kerberos context during Http Request
+	 */	
 	public RemoteAdminBuilder withUseKerberos(boolean useKerberos)
 	{
 		this.useKerberos = useKerberos;
@@ -122,6 +142,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Externally configured Apache HttpClient
+	 */
 	public RemoteAdminBuilder withHttpClient(HttpClient httpClient)
 	{
 		this.httpClient = httpClient;
@@ -136,6 +159,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Number of times to attempt request
+	 */
 	public RemoteAdminBuilder withMaxRetries(int maxRetries)
 	{
 		this.maxRetries = maxRetries;
@@ -143,6 +169,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Sleet time between requests on connection failure
+	 */
 	public RemoteAdminBuilder withSleepTime(int sleepTime)
 	{
 		this.sleepTime = sleepTime;
@@ -150,6 +179,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Connection timeout in milliseconds
+	 */
 	public RemoteAdminBuilder withConnectionTimeout(int connectionTimeout)
 	{
 		this.connectionTimeout = connectionTimeout;
@@ -157,6 +189,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Allow use of self-signed SSL certificates
+	 */	
 	public RemoteAdminBuilder withAllowSelfSignedCertificates(boolean allowSelfSignedCertificates)
 	{
 		this.allowSelfSignedCerts = allowSelfSignedCertificates;
@@ -164,6 +199,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Host name and port, i.e. hostname1:8080
+	 */	
 	public RemoteAdminBuilder addHost(final String hostName)
 	{
 		this.hosts.add(hostName);
@@ -171,6 +209,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
+	/**
+	 * Extra headers added to the request
+	 */
 	public RemoteAdminBuilder addExtraHeader(final String headerName, final String headerValue)
 	{
 		this.extraHeaders.put(headerName,  headerValue);
