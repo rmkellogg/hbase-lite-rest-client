@@ -19,6 +19,8 @@
 
 package org.apache.hadoop.hbase.client.lite;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +35,12 @@ import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Lookup;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 
 public abstract class BaseHBaseBuilder 
 {
@@ -85,8 +90,12 @@ public abstract class BaseHBaseBuilder
 	 * Kerberos User Principal (ignored if useKerberos is not true)
 	 */
 	protected String userPrincipal;
+	/**
+	 * Allow use of self-signed SSL certificates
+	 */
+	protected boolean allowSelfSignedCerts;
 	
-	protected HttpClient buildHttpClient()
+	protected HttpClient buildHttpClient() throws IOException 
 	{
 		// Establish timeout configuration
 		RequestConfig config = RequestConfig.custom()
@@ -110,6 +119,24 @@ public abstract class BaseHBaseBuilder
 			builder.setDefaultCredentialsProvider(credentialsProvider);
 		}
 		
+		// Only allow for self-signed certificates of single chain depth
+		if (allowSelfSignedCerts && ("https".equalsIgnoreCase(protocol)))
+		{
+			SSLContextBuilder sslBuilder = new SSLContextBuilder();
+			
+			try
+			{
+				sslBuilder.loadTrustMaterial(null, TrustSelfSignedStrategy.INSTANCE);
+				SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslBuilder.build());
+		
+				builder.setSSLSocketFactory(sslsf);
+			}
+			catch (GeneralSecurityException ex)
+			{
+				throw new IOException(ex);
+			}
+		}
+		
 		return builder.build();
 	}
 	
@@ -125,3 +152,4 @@ public abstract class BaseHBaseBuilder
 		}
 	}
 }
+

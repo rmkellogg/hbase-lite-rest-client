@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hbase.client.lite;
 
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.lite.impl.Client;
 import org.apache.hadoop.hbase.client.lite.impl.Cluster;
@@ -35,7 +37,8 @@ import org.apache.http.client.HttpClient;
  *							.withProtocol("https")
  *							.withMaxRetries(10)
  *							.withSleepTime(1000)
- *							.withHttpClient(httpClient)
+ *                          .withAllowSelfSignedCertificates(false)
+ *							.withHttpClient(httpClient) // Normally not required
  *							.build();
  * </pre>
  */
@@ -54,6 +57,7 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	}
 
 	public RemoteAdmin build()
+	throws IOException
 	{
 		Cluster cluster = new Cluster();
 		HttpClient tempHttpClient = httpClient;
@@ -111,7 +115,7 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 		return this;
 	}
 	
-	public RemoteAdminBuilder withUserKerberos(boolean useKerberos)
+	public RemoteAdminBuilder withUseKerberos(boolean useKerberos)
 	{
 		this.useKerberos = useKerberos;
 		
@@ -149,6 +153,13 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	public RemoteAdminBuilder withConnectionTimeout(int connectionTimeout)
 	{
 		this.connectionTimeout = connectionTimeout;
+		
+		return this;
+	}
+	
+	public RemoteAdminBuilder withAllowSelfSignedCertificates(boolean allowSelfSignedCertificates)
+	{
+		this.allowSelfSignedCerts = allowSelfSignedCertificates;
 		
 		return this;
 	}

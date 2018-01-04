@@ -12,9 +12,10 @@ Care has been taken to allow for use against existing clients of the RemoteHTabl
 Improvements:
 
    * Fluent API for construction of RemoteHTable and RemoteAdmin.
-   * Access to underlying Apache HttpClient for unique client needs
+   * Access to underlying Apache HttpClient for unique client needs (Kerberos, Self-Signed Certs, etc).
    * Reduced footprint by stripping away rarely used or methods not supported by the HBase REST Server.
    * RemoteHTable and RemoteAdmin are now interfaces.
+   * Support for Kerberos authentication via keytab and user principal
    * API improvements using Strings and other primitives in addition to byte arrays on: Result, Get, Put
    
 
@@ -30,7 +31,8 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .withProtocol("http")
                             .withMaxRetries(10)
                             .withSleepTime(1000)
-                            .withHttpClient(httpClient)
+                            .withAllowSelfSignedCertificates(false)
+                            .withHttpClient(httpClient) // Normally not required
                             .build();
 ```
   
@@ -122,7 +124,8 @@ RemoteAdmin Example:
                         .withProtocol("https")
                         .withMaxRetries(10)
                         .withSleepTime(1000)
-                        .withHttpClient(httpClient)
+                        .withAllowSelfSignedCertificates(false)
+                        .withHttpClient(httpClient) // Normally not required
                         .build();
 
  System.out.println(admin.getRestVersion());
