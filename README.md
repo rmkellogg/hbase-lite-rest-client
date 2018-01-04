@@ -34,11 +34,11 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             //.withAllowSelfSignedCertificates(false)
                             
                             // Set these for use of Kerberos
-								  //.withUseKerberos(true)
-								  //.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
-								  //.withUserPrincipal("hbase/hostname@REALM.COM")
-								     
-								  // With explicit HttpClient but normally not required                            
+                            //.withUseKerberos(true)
+                            //.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
+                            //.withUserPrincipal("hbase/hostname@REALM.COM")
+                                     
+                            // With explicit HttpClient but normally not required                            
                             //.withHttpClient(httpClient) 
                             
                             .build();
