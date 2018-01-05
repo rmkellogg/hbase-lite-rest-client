@@ -21,6 +21,8 @@ Improvements:
 
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
 
+For use with Kerberos, you can specify the User Principal and Keytab explicitly or do a kinit prior to execution.
+
 RemoteHTable Construction:
 
 ```
@@ -33,10 +35,13 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .withSleepTime(1000)
                             //.withAllowSelfSignedCertificates(false)
                             
-                            // Set these for use of Kerberos
+                            // Set these for use of Kerberos, Principal and Keytab
                             //.withUseKerberos(true)
                             //.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
                             //.withUserPrincipal("hbase/hostname@REALM.COM")
+
+                            // Set these for use of Kerberos and external kinit
+                            //.withUseKerberos(true)
                                      
                             // With explicit HttpClient but normally not required                            
                             //.withHttpClient(httpClient) 

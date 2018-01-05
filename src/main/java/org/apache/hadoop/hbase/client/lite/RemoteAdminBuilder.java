@@ -39,10 +39,13 @@ import org.apache.http.client.HttpClient;
  *							.withSleepTime(1000)
  *                          .withAllowSelfSignedCertificates(false)
  *                          
- *                          // Set these for use of Kerberos
+ *                          // Set these for use of Kerberos, Principal and Keytab
  *							//.withUseKerberos(true)
  *							//.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
  *  						//.withUserPrincipal("hbase/hostname@REALM.COM")
+ *
+ *                          // Set these for use of Kerberos and external kinit
+ *							//.withUseKerberos(true)
  *  
  *                          // With explicit HttpClient but normally not required                            
  *                          //.withHttpClient(httpClient)

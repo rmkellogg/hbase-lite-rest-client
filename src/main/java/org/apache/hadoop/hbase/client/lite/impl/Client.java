@@ -38,6 +38,7 @@ import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,11 +70,11 @@ public class Client {
  private HttpGet httpGet = null;
  private String protocol;
  /**
-  * Kerberos Keytab file location
+  * Kerberos Keytab file location (optional)
   */
  private String keyTabLocation;
  /**
-  * Kerberos User Principal
+  * Kerberos User Principal (optional)
   */
  private String userPrincipal;
  /**
@@ -197,7 +198,10 @@ public class Client {
 	   try {
 	     ClientLoginConfig loginConfig = new ClientLoginConfig(keyTabLocation, userPrincipal, null);
 		 Set<Principal> princ = new HashSet<Principal>(1);
-		 princ.add(new KerberosPrincipal(userPrincipal));
+		 if (userPrincipal != null) {
+			 princ.add(new KerberosPrincipal(userPrincipal));
+		 }
+		 
 		 Subject sub = new Subject(false, princ, new HashSet<Object>(), new HashSet<Object>());
 		 LoginContext lc = new LoginContext("", sub, null, loginConfig);
 		 lc.login();
@@ -209,8 +213,14 @@ public class Client {
 				}
 			});
 	   }
+	   catch (LoginException ex) {
+		   if (userPrincipal == null) {
+			   LOG.error("UserPrincipal not specified.  Remember to kinit prior to execution.");
+		   }
+		   throw new IOException(ex.getMessage(),ex);
+	   }
 	   catch (Exception ex) {
-		   throw new IOException(ex.getMessage());
+		   throw new IOException(ex.getMessage(),ex);
 	   }
    } else {
      resp = httpClient.execute(method);
