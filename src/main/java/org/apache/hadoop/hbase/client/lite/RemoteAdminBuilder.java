@@ -19,6 +19,7 @@ package org.apache.hadoop.hbase.client.lite;
 
 import java.io.IOException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.client.lite.impl.Client;
 import org.apache.hadoop.hbase.client.lite.impl.Cluster;
@@ -39,16 +40,17 @@ import org.apache.http.client.HttpClient;
  *							.withSleepTime(1000)
  *                          .withAllowSelfSignedCertificates(false)
  *                          
- *                          // Set these for use of Kerberos, Principal and Keytab
- *							//.withUseKerberos(true)
- *							//.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
- *  						//.withUserPrincipal("hbase/hostname@REALM.COM")
- *
- *                          // Set these for use of Kerberos and external kinit
- *							//.withUseKerberos(true)
+ *                          // Set these for use of Kerberos with Principal and Keytab
+ *							//.withUseKerberos("hbase/hostname@REALM.COM","/etc/security/keytabs/hbase.security.keytab")
  *  
- *                          // With explicit HttpClient but normally not required                            
- *                          //.withHttpClient(httpClient)
+ *                          // Set these for use of Kerberos with external kinit
+ *							//.withUseKerberos()
+ *
+ *                          // Set these for use of Kerberos with external JAAS configuration
+ *							//.withUseJAAS()
+ *
+ *                          // Set these for use of Preemptive Basic Authentication
+ *							//.withUsePreemptiveBasicAuthentication("hbase-user","hbase-password")
  *                           
  *							.build();
  * </pre>
@@ -78,7 +80,7 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 			tempHttpClient = buildHttpClient();
 		}
 		
-		Client client = new Client(cluster, protocol, tempHttpClient, useKerberos, userPrincipal, keyTabLocation);
+		Client client = new Client(cluster, protocol, tempHttpClient, useKerberos, useJAAS, userPrincipal, keyTabLocation);
 		
 		if (hosts.isEmpty())
 		{
@@ -106,7 +108,11 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	}
 
 	/**
-	 * Protocol used in creation of URL, i.e. http or https
+	 * Protocol used in creation of URL
+	 * 
+	 * @param protocol Protocol (required) either http or https
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */
 	public RemoteAdminBuilder withProtocol(final String protocol)
 	{
@@ -116,37 +122,73 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	}
 	
 	/**
-	 * Kerberos User Principal (ignored if useKerberos is not true)
+	 * Use Kerberos context during Http Request with external kinit
+	 * 
+  	 * @return RemoteAdminBuilder
+	 */	
+	public RemoteAdminBuilder withUseKerberos()
+	{
+		this.useKerberos = true;
+		
+		return this;
+	}
+
+	/**
+	 * Use Kerberos context during Http Request with user supplied principal and keytab location.
+	 * 
+	 * @param userPrincipal User Principal (required) (hbase/hostname@REALM.COM)
+	 * @param keyTabLocation Kerberos Keytab Location (required) (/etc/security/keytabs/hbase.security.keytab)
+	 * 
+  	 * @return RemoteAdminBuilder
+	 */	
+	public RemoteAdminBuilder withUseKerberos(String userPrincipal, String keyTabLocation)
+	{
+		if ((userPrincipal != null) && (keyTabLocation != null))
+		{
+			this.useKerberos = true;
+			this.userPrincipal = StringUtils.trimToNull(userPrincipal);
+			this.keyTabLocation = StringUtils.trimToNull(keyTabLocation);
+		}
+		
+		return this;
+	}
+
+	/**
+	 * Use Preemptive Basic Authentication 
+	 * 
+	 * @param userName User Name (required)
+	 * @param password Password (required)
+	 * 
+	 * @return RemoteAdminBuilder
 	 */
-	public RemoteAdminBuilder withUserPrincipal(String userPrincipal)
+	public RemoteAdminBuilder withUsePreemptiveBasicAuthentication(String userName, String password)
 	{
-		this.userPrincipal = StringUtils.trimToNull(userPrincipal);
+		if ((userName != null) && (password != null))
+		{
+			String authHeader = Base64.encodeBase64String((userName + ":" + password).getBytes());
+
+			addExtraHeader("Authorization", "Basic " + authHeader);
+		}
 		
 		return this;
 	}
 	
 	/**
-	 * Kerberos Keytab file location (ignored if useKerberos is not true)
+	 * Use external JAAS configuration for Kerberos configuration
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */	
-	public RemoteAdminBuilder withKeyTabLocation(String keyTabLocation)
+	public RemoteAdminBuilder withUseJAAS()
 	{
-		this.keyTabLocation = StringUtils.trimToNull(keyTabLocation);
-		
-		return this;
-	}
-	
-	/**
-	 * Use Kerberos context during Http Request
-	 */	
-	public RemoteAdminBuilder withUseKerberos(boolean useKerberos)
-	{
-		this.useKerberos = useKerberos;
+		this.useJAAS = true;
 		
 		return this;
 	}
 	
 	/**
 	 * Externally configured Apache HttpClient
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */
 	public RemoteAdminBuilder withHttpClient(HttpClient httpClient)
 	{
@@ -164,6 +206,8 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	
 	/**
 	 * Number of times to attempt request
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */
 	public RemoteAdminBuilder withMaxRetries(int maxRetries)
 	{
@@ -173,7 +217,9 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	}
 	
 	/**
-	 * Sleet time between requests on connection failure
+	 * Sleep time between requests on connection failure
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */
 	public RemoteAdminBuilder withSleepTime(int sleepTime)
 	{
@@ -184,6 +230,8 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	
 	/**
 	 * Connection timeout in milliseconds
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */
 	public RemoteAdminBuilder withConnectionTimeout(int connectionTimeout)
 	{
@@ -194,6 +242,8 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	
 	/**
 	 * Allow use of self-signed SSL certificates
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */	
 	public RemoteAdminBuilder withAllowSelfSignedCertificates(boolean allowSelfSignedCertificates)
 	{
@@ -203,7 +253,11 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	}
 	
 	/**
-	 * Host name and port, i.e. hostname1:8080
+	 * Host name and port 
+	 * 
+	 * @param hostName Hostname and port (required) (hostname1:8080)
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */	
 	public RemoteAdminBuilder addHost(final String hostName)
 	{
@@ -214,6 +268,11 @@ public class RemoteAdminBuilder extends BaseHBaseBuilder
 	
 	/**
 	 * Extra headers added to the request
+	 * 
+	 * @param headerName Header Name (required)
+	 * @param HeaderValue Header Value (required)
+	 * 
+  	 * @return RemoteAdminBuilder
 	 */
 	public RemoteAdminBuilder addExtraHeader(final String headerName, final String headerValue)
 	{

@@ -12,16 +12,17 @@ Care has been taken to allow for use against existing clients of the RemoteHTabl
 Improvements:
 
    * Fluent API for construction of RemoteHTable and RemoteAdmin.
-   * Access to underlying Apache HttpClient for unique client needs (Kerberos, Self-Signed Certs, etc).
+   * API improvements using Strings and other primitives in addition to byte arrays on: Result, Get, Put
+   * Easy use of Kerberos and preemptive basic authentication
+   * Easy configuration support for self-signed SSL certificates
    * Reduced footprint by stripping away rarely used or methods not supported by the HBase REST Server.
    * RemoteHTable and RemoteAdmin are now interfaces.
    * Support for Kerberos authentication via keytab and user principal
-   * API improvements using Strings and other primitives in addition to byte arrays on: Result, Get, Put
-   
+   * Access to underlying Apache HttpClient for unique client needs
 
 Note: This REST Client was based on Apache HBase 2.0 Alpha 4.
 
-For use with Kerberos, you can specify the User Principal and Keytab explicitly or do a kinit prior to execution.
+For use with Kerberos, you have three options: specify the User Principal and Keytab explicitly, do a kinit prior to execution or use an external JAAS configuration file.
 
 RemoteHTable Construction:
 
@@ -35,18 +36,19 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             .withSleepTime(1000)
                             //.withAllowSelfSignedCertificates(false)
                             
-                            // Set these for use of Kerberos, Principal and Keytab
-                            //.withUseKerberos(true)
-                            //.withKeyTabLocation("/etc/security/keytabs/hbase.security.keytab")
-                            //.withUserPrincipal("hbase/hostname@REALM.COM")
-
-                            // Set these for use of Kerberos and external kinit
-                            //.withUseKerberos(true)
-                                     
-                            // With explicit HttpClient but normally not required                            
-                            //.withHttpClient(httpClient) 
+                            // Set these for use of Kerberos with Principal and Keytab
+                            //.withUseKerberos("hbase/hostname@REALM.COM","/etc/security/keytabs/hbase.security.keytab")
+  
+                            // Set these for use of Kerberos with external kinit
+                            //.withUseKerberos()
+                        
+                            // Set these for use of Kerberos with external JAAS configuration
+                            //.withUseJAAS()
+                        
+                            // Set these for use of Preemptive Basic Authentication
+                            //.withUsePreemptiveBasicAuthentication("hbase-user","hbase-password")
                             
-                            .build();
+                        .build();
 ```
   
 Legacy RemoteHTable examples using byte arrays:
@@ -144,4 +146,17 @@ RemoteAdmin Example:
 
  System.out.println(admin.getRestVersion());
  System.out.println(admin.getTableList());                      
+```
+
+Example Kerberos JAAS Configuration:
+
+```
+Client {
+com.sun.security.auth.module.Krb5LoginModule required
+useKeyTab=true
+storeKey=true
+useTicketCache=false
+keyTab="/etc/security/keytabs/hbase.service.keytab"
+principal="hbase/hostname@REALM.COM";
+}                       
 ```

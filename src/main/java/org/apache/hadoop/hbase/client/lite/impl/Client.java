@@ -81,13 +81,18 @@ public class Client {
   * Execute Http Request using Kerberos context
   */
  private boolean useKerberos = false;
+ /**
+  * Use external JAAS configuration for Kerberos configuration?
+  */
+ private boolean useJAAS = false;
  
  private Map<String, String> extraHeaders = new ConcurrentHashMap<>();
 
- public Client(Cluster cluster, String protocol, HttpClient httpClient, boolean useKerberos, String userPrincipal, String keyTabLocation) {
+ public Client(Cluster cluster, String protocol, HttpClient httpClient, boolean useKerberos, boolean useJAAS, String userPrincipal, String keyTabLocation) {
 	 this.cluster = cluster;
 	 this.protocol = protocol;
 	 this.httpClient = httpClient;
+	 this.useJAAS = useJAAS;
 	 this.useKerberos = useKerberos;
 	 this.userPrincipal = userPrincipal;
 	 this.keyTabLocation = keyTabLocation;
@@ -193,17 +198,26 @@ public class Client {
    long startTime = System.currentTimeMillis();
    if (resp != null) EntityUtils.consumeQuietly(resp.getEntity());
    
-   if (useKerberos) {
+   if (useKerberos || useJAAS) {
 	   // Execute HTTP Operation within Kerberos Security Context
 	   try {
-	     ClientLoginConfig loginConfig = new ClientLoginConfig(keyTabLocation, userPrincipal, null);
-		 Set<Principal> princ = new HashSet<Principal>(1);
-		 if (userPrincipal != null) {
-			 princ.add(new KerberosPrincipal(userPrincipal));
+	   	 LoginContext lc = null;
+	   	 
+	   	 // Use external JAAS configuration for location of principal and keytab
+		 if (useJAAS) {
+			lc = new LoginContext("Client");
+		 } else {
+			 // Either use explicit principal/keytab or previously set kinit principal
+		     ClientLoginConfig loginConfig = new ClientLoginConfig(keyTabLocation, userPrincipal, null);
+			 Set<Principal> princ = new HashSet<Principal>(1);
+			 if (userPrincipal != null) {
+				 princ.add(new KerberosPrincipal(userPrincipal));
+			 }
+			 
+			 Subject sub = new Subject(false, princ, new HashSet<Object>(), new HashSet<Object>());
+			 lc = new LoginContext("", sub, null, loginConfig);
 		 }
 		 
-		 Subject sub = new Subject(false, princ, new HashSet<Object>(), new HashSet<Object>());
-		 LoginContext lc = new LoginContext("", sub, null, loginConfig);
 		 lc.login();
 		 Subject serviceSubject = lc.getSubject();
 		 return Subject.doAs(serviceSubject, new PrivilegedExceptionAction<HttpResponse>() {
@@ -213,10 +227,18 @@ public class Client {
 				}
 			});
 	   }
-	   catch (LoginException ex) {
-		   if (userPrincipal == null) {
+	   catch (LoginException ex)
+	   {
+		   if (useJAAS) { 
+			   if  (System.getProperty("java.security.auth.login.config",null) == null) {
+				   LOG.error("Missing JAAS Configuration, i.e. -Djava.security.auth.login.config=/etc/config/client_jaas.conf");
+			   } else {
+				   LOG.error("Using JAAS Config file: " + System.getProperty("java.security.auth.login.config",null));
+			   }
+		   } else if (useKerberos && userPrincipal == null) {
 			   LOG.error("UserPrincipal not specified.  Remember to kinit prior to execution.");
 		   }
+ 
 		   throw new IOException(ex.getMessage(),ex);
 	   }
 	   catch (Exception ex) {
