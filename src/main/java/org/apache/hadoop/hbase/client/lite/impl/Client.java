@@ -82,17 +82,17 @@ public class Client {
   */
  private boolean useKerberos = false;
  /**
-  * Use external JAAS configuration for Kerberos configuration?
+  * Name of entry in external JAAS configuration for Kerberos configuration?
   */
- private boolean useJAAS = false;
+ private String jaasEntryName;
  
  private Map<String, String> extraHeaders = new ConcurrentHashMap<>();
 
- public Client(Cluster cluster, String protocol, HttpClient httpClient, boolean useKerberos, boolean useJAAS, String userPrincipal, String keyTabLocation) {
+ public Client(Cluster cluster, String protocol, HttpClient httpClient, boolean useKerberos, String jaasEntryName, String userPrincipal, String keyTabLocation) {
 	 this.cluster = cluster;
 	 this.protocol = protocol;
 	 this.httpClient = httpClient;
-	 this.useJAAS = useJAAS;
+	 this.jaasEntryName = jaasEntryName;
 	 this.useKerberos = useKerberos;
 	 this.userPrincipal = userPrincipal;
 	 this.keyTabLocation = keyTabLocation;
@@ -197,6 +197,8 @@ public class Client {
    }
    long startTime = System.currentTimeMillis();
    if (resp != null) EntityUtils.consumeQuietly(resp.getEntity());
+   
+   boolean useJAAS = (jaasEntryName != null);
    
    if (useKerberos || useJAAS) {
 	   // Execute HTTP Operation within Kerberos Security Context

@@ -83,9 +83,9 @@ public abstract class BaseHBaseBuilder
 	 */
 	protected boolean useKerberos;
 	 /**
-	  * Use external JAAS configuration for Kerberos configuration?
+	  * Name of entry in external JAAS configuration for Kerberos configuration?
 	  */
-	protected boolean useJAAS;
+	protected String jaasEntryName;
 	/**
 	 * Kerberos Keytab file location (ignored if useKerberos is not true)
 	 */
@@ -112,7 +112,7 @@ public abstract class BaseHBaseBuilder
 		builder.setDefaultRequestConfig(config);
 		
 		// Enable Kerberos authentication
-		if (useKerberos || useJAAS)
+		if (useKerberos || (jaasEntryName != null))
 		{
 			Lookup<AuthSchemeProvider> authSchemeRegistry = RegistryBuilder.<AuthSchemeProvider> create()
 																.register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory(true))

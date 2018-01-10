@@ -43,7 +43,7 @@ RemoteHTable table = RemoteHTableBuilder.create("namespace:tablename")
                             //.withUseKerberos()
                         
                             // Set these for use of Kerberos with external JAAS configuration
-                            //.withUseJAAS()
+                            //.withUseJAAS("Client")
                         
                             // Set these for use of Preemptive Basic Authentication
                             //.withUsePreemptiveBasicAuthentication("hbase-user","hbase-password")

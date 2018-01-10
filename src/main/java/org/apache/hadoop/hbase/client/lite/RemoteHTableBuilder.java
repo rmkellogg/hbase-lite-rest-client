@@ -47,7 +47,7 @@ import org.apache.http.client.HttpClient;
  *							//.withUseKerberos()
  *
  *                          // Set these for use of Kerberos with external JAAS configuration
- *							//.withUseJAAS()
+ *							//.withUseJAAS("Client")
  *
  *                          // Set these for use of Preemptive Basic Authentication
  *							//.withUsePreemptiveBasicAuthentication("hbase-user","hbase-password")
@@ -85,7 +85,7 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 			tempHttpClient = buildHttpClient();
 		}
 		
-		Client client = new Client(cluster, protocol, tempHttpClient, useKerberos, useJAAS, userPrincipal, keyTabLocation);
+		Client client = new Client(cluster, protocol, tempHttpClient, useKerberos, jaasEntryName, userPrincipal, keyTabLocation);
 		
 		if (hosts.isEmpty())
 		{
@@ -181,11 +181,13 @@ public class RemoteHTableBuilder extends BaseHBaseBuilder
 	/**
 	 * Use external JAAS configuration for Kerberos configuration
 	 * 
+	 * @param jaasEntry Name of JAAS Entry to use for login
+	 * 
   	 * @return RemoteHTableBuilder
 	 */	
-	public RemoteHTableBuilder withUseJAAS()
+	public RemoteHTableBuilder withUseJAAS(String jaasEntryName)
 	{
-		this.useJAAS = true;
+		this.jaasEntryName = StringUtils.trimToNull(jaasEntryName);
 		
 		return this;
 	}
